@@ -15,6 +15,6 @@
     -fx-bar-fill: darkolivegreen;
 }
 
-.root {
+.padded-container {
     -fx-padding: 10;
 }

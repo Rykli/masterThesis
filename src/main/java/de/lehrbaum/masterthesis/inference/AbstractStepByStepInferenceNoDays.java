@@ -3,12 +3,7 @@ package de.lehrbaum.masterthesis.inference;
 /**
  * General inference for no days
  */
-public abstract class InferenceNoDays {
-	public enum SYMPTOM_STATE {
-		UNKOWN,
-		PRESENT,
-		ABSENT
-	}
+public abstract class AbstractStepByStepInferenceNoDays implements StepByStepInferenceNoDays {
 	/**
 	 * Contains probabilities at [disease][symptom].
 	 */
@@ -21,45 +16,38 @@ public abstract class InferenceNoDays {
 	 * The current probability for each disease.
 	 */
 	protected double[] currentProbabilities;
-	private double [][][] probabilitiesAssumingCache;
 
 	private boolean [] symptomsAnswered;
 
 	private int symptomCount;
 
-	public InferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities) {
+	public AbstractStepByStepInferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities) {
 		currentProbabilities = this.aPrioriProbabilities = aPrioriProbabilities;
 		this.probabilities = probabilities;
 		symptomCount = probabilities[0].length;
-		probabilitiesAssumingCache =  new double[symptomCount][2][];
 		symptomsAnswered = new boolean[symptomCount];
 	}
 
+	@Override
 	public double[] getDiseaseProbabilities() {
 		return currentProbabilities;
 	}
 
-	public abstract double[] calculateGivenAllAnswers(SYMPTOM_STATE[] symptomsAnswered);
-
-	public double[] probabilityAssumingSymptom(int symptom, boolean has) {
-		if(probabilitiesAssumingCache[symptom][has?1:0] == null)
-			probabilitiesAssumingCache[symptom][has?1:0] = calculateGivenSymptom(symptom, has);
-		return probabilitiesAssumingCache[symptom][has?1:0];
-	}
-
 	protected abstract double [] calculateGivenSymptom(int symptom, boolean has);
 
+	@Override
 	public void symptomAnswered(int symptom, boolean has) {
-		currentProbabilities = probabilityAssumingSymptom(symptom, has);
+		currentProbabilities = calculateGivenSymptom(symptom, has);
 		//empty cache
 		symptomsAnswered[symptom] = true;
-		probabilitiesAssumingCache = new double[amountSymptoms()][2][];
 	}
 
+	@Override
 	public boolean wasSymptomAnswered(int symptom) {
 		return symptomsAnswered[symptom];
 	}
 
+	@Override
 	public int amountSymptoms() {
 		return symptomCount;
 	}

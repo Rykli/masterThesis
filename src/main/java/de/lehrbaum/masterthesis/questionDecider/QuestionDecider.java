@@ -1,7 +1,6 @@
 package de.lehrbaum.masterthesis.questionDecider;
 
-import de.lehrbaum.masterthesis.inference.InferenceNoDays;
-import de.lehrbaum.masterthesis.MathUtils;
+import de.lehrbaum.masterthesis.inference.AbstractStepByStepInferenceNoDays;
 
 /**
  * This class should decide what question to ask next.
@@ -13,8 +12,8 @@ public class QuestionDecider {
 	private int questionToAsk;
 
 	//private double GAIN_THRESHOLD = 0.1;
-	public QuestionDecider(InferenceNoDays inference) {
-		if(inference.amountSymptoms() < 1)
+	public QuestionDecider(AbstractStepByStepInferenceNoDays inference) {
+		/*if(inference.amountSymptoms() < 1)
 			throw new IllegalArgumentException("No symptoms");
 		questionToAsk = -1;
 		double gainByQuestion = -Double.MAX_VALUE;
@@ -38,7 +37,7 @@ public class QuestionDecider {
 		}
 
 		//if the gain is to low try to figure one disease out
-		//if(gainByQuestion < )
+		//if(gainByQuestion < )*/
 	}
 
 	/**
