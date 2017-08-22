@@ -1,8 +1,5 @@
 package de.lehrbaum.masterthesis;
 
-import de.lehrbaum.masterthesis.data.NoDaysDefaultData;
-import de.lehrbaum.masterthesis.inference.AbstractStepByStepInferenceNoDays;
-import de.lehrbaum.masterthesis.inference.Bayes.BayesInferenceNoDays;
 import de.lehrbaum.masterthesis.view.MainWindow;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -12,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.logging.*;
 
 public class Main extends Application{
@@ -22,27 +18,6 @@ public class Main extends Application{
 		initializeLogging();
 		//testStuff();
 		launch(args);
-	}
-
-	private static void testStuff() {
-
-		AbstractStepByStepInferenceNoDays inference = new BayesInferenceNoDays(NoDaysDefaultData.probabilities, NoDaysDefaultData.aPriorProbabilities);
-		inference.symptomAnswered(0, true);
-		inference.symptomAnswered(1, true);
-		inference.symptomAnswered(2, false);
-		inference.symptomAnswered(11, true);
-		inference.symptomAnswered(14, true);
-		logger.info(Arrays.toString(inference.getDiseaseProbabilities()));
-		inference.symptomAnswered(14, true);
-		logger.info(Arrays.toString(inference.getDiseaseProbabilities()));
-
-		inference = new BayesInferenceNoDays(NoDaysDefaultData.probabilities, NoDaysDefaultData.aPriorProbabilities);
-		inference.symptomAnswered(0, true);
-		inference.symptomAnswered(1, true);
-		inference.symptomAnswered(2, false);
-		inference.symptomAnswered(14, true);
-		inference.symptomAnswered(11, true);
-		logger.info(Arrays.toString(inference.getDiseaseProbabilities()));
 	}
 
 	private static void initializeLogging() {
