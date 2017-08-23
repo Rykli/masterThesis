@@ -31,7 +31,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.*;
-import static de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays.VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1;
+import static de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays.VARIANTS
+		.SYMPTOMS_CALCULATION_VARIANT_1;
 import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
 
 class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableViewState{
@@ -137,6 +138,15 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 				USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.CENTER, true));
 		gridPane.getColumnConstraints().add(new ColumnConstraints(USE_PREF_SIZE,
 				USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.CENTER, true));
+
+		Button clearAll = new Button("Auswahl zurücksetzen");
+		clearAll.setMaxWidth(Double.POSITIVE_INFINITY);
+		clearAll.setOnAction(event -> {
+			for(ToggleGroup group : symptomToggleGroups)
+				group.selectToggle(null);
+		});
+		gridPane.addRow(symptoms.length + 1, clearAll);
+
 	}
 
 	private void setUpRightSide(HBox root) {

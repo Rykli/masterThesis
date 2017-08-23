@@ -1,5 +1,7 @@
 package de.lehrbaum.masterthesis.inferencenodays;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 
 import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
@@ -22,6 +24,7 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays{
 	 */
 	protected double[] currentProbabilities;
 
+	@NotNull
 	protected SYMPTOM_STATE[] symptomsAnswered;
 
 	public AbstractInferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities) {

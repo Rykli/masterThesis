@@ -1,9 +1,13 @@
-.unknown-button:selected {
-    -fx-base: cornflowerblue;
+.present-button {
+   /* -fx-base: rgba(0, 128, 0, 0.1);*/
 }
 
 .present-button:selected {
     -fx-base: green;
+}
+
+.absent-button {
+    /*-fx-base: rgba(255, 0, 0, 0.1);*/
 }
 
 .absent-button:selected {

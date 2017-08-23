@@ -19,9 +19,12 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 
 	public enum VARIANTS {
 		SYMPTOMS_CALCULATION_VARIANT_1,
+		/**
+		 * This variant is stupid it calculates lower numbers the more symptoms there are.
+		 */
 		SYMPTOMS_CALCULATION_VARIANT_2
 		;
-		public static final EnumSet<VARIANTS> defSet = EnumSet.of(SYMPTOMS_CALCULATION_VARIANT_1);
+		public static final EnumSet<VARIANTS> defaultSet = EnumSet.of(SYMPTOMS_CALCULATION_VARIANT_1);
 	}
 
 	/**
@@ -129,6 +132,8 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 				SYMPTOM_STATE[] symptomInformation = symptomsAnswered.clone();
 				symptomInformation[symptom] = SYMPTOM_STATE.PRESENT;
 				double prob = calculatePrOfSymptoms(aPrioriProbabilities, probabilities, symptomInformation);
+				symptomProbabilities[symptom][0] = prob;
+				symptomProbabilities[symptom][1] = 1 - prob;
 			}
 		}
 	}

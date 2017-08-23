@@ -22,7 +22,7 @@ public class BayesNoDaysMoreLikelyTest {
 
 	private void testIfCaseHoldsCompleteBayesInference(ExampleCase exCase) {
 		CompleteInferenceNoDays inference = new BayesInferenceNoDays(NoDaysDefaultData.probabilities,
-				NoDaysDefaultData.aPriorProbabilities, BayesInferenceNoDays.VARIANTS.defSet);
+				NoDaysDefaultData.aPriorProbabilities, BayesInferenceNoDays.VARIANTS.defaultSet);
 		inference.calculateGivenAllAnswers(exCase.symptomStates);
 		double probLikelyDisease = inference.getDiseaseProbabilities()[exCase.likelyDisease];
 		double probUnlikelyDisease = inference.getDiseaseProbabilities()[exCase.unlikelyDisease];

@@ -59,9 +59,9 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		setUpFileLogger();// when running as application set up a file logger.
-		Scene scene = new Scene(new MainWindow(), 1100, 700);
+		Scene scene = new Scene(new MainWindow(), 1100, 750);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Sebastian Master Thesis");
+		primaryStage.setTitle("Lehrbaum Master Thesis");
 		primaryStage.show();
 	}
 }
