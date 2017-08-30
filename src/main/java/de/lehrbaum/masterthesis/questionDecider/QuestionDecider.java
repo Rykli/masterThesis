@@ -3,13 +3,12 @@ package de.lehrbaum.masterthesis.questionDecider;
 import de.lehrbaum.masterthesis.inferencenodays.AbstractInferenceNoDays;
 
 /**
- * This class should decide what question to ask next.
- * It estimates a gain for each question that could be asked. The gain means how much extra information
- * has been gained by asking the question. If not more gain is possible, it tries to eliminate the main
- * possibilities.
+ * This class should decide what question to ask next. It estimates a gain for each question that could be asked. The
+ * gain means how much extra information has been gained by asking the question. If not more gain is possible, it tries
+ * to eliminate the main possibilities.
  */
 public class QuestionDecider {
-	private int questionToAsk = -1;
+	private int questionToAsk = - 1;
 
 	//private double GAIN_THRESHOLD = 0.1;
 	public QuestionDecider(AbstractInferenceNoDays inference) {
@@ -25,7 +24,8 @@ public class QuestionDecider {
 					inferencenodays.probabilityAssumingSymptom(symptom, false)));
 			//int finalSymptom = symptom;
 			//double propOfNo = IntStream.range(0, inferencenodays.probabilities.length).
-			//		mapToDouble(i -> inferencenodays.getDiseaseProbabilities()[i] * inferencenodays.probabilities[i][finalSymptom])
+			//		mapToDouble(i -> inferencenodays.getDiseaseProbabilities()[i] * inferencenodays
+			.probabilities[i][finalSymptom])
 			//		.sum();
 			double gainIfYes = Math.abs(MathUtils.distance(inferencenodays.getDiseaseProbabilities(),
 					inferencenodays.probabilityAssumingSymptom(symptom, true)));
@@ -41,7 +41,6 @@ public class QuestionDecider {
 	}
 
 	/**
-	 *
 	 * @return -1 means it is recommended to stop asking and just return the highest result
 	 */
 	public int recommendedSymptomToAsk() {

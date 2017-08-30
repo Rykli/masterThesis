@@ -11,37 +11,22 @@ public class MathUtils {
 
 	private static DistanceImpl distanceImpl = new BhattacharyyaDistance();
 
-	public static double [] normalize(double [] vector) {
+	public static double[] normalize(double[] vector) {
 		double sum = DoubleStream.of(vector).sum();
-		return DoubleStream.of(vector).map(d -> d/sum).toArray();
+		return DoubleStream.of(vector).map(d -> d / sum).toArray();
 	}
 
-	public static double distance(double [] firstDistribution, double[] secondDistribution) {
+	public static double distance(double[] firstDistribution, double[] secondDistribution) {
 		assert firstDistribution.length == secondDistribution.length;
 		return distanceImpl.distance(firstDistribution, secondDistribution);
 	}
 
-	private interface DistanceImpl {
-		double distance(double[] firstDistr, double[] secondDistr);
-	}
-
-	private static class BhattacharyyaDistance implements DistanceImpl {
-		@Override
-		public double distance(double[] firstDistr, double[] secondDistr) {
-			// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
-			double sum = 0;
-			for(int i = 0; i < firstDistr.length; i++) {
-				sum += Math.sqrt(firstDistr[i]*secondDistr[i]);
-			}
-			return -Math.log(sum);
-		}
-	}
-
-	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, CompleteInferenceNoDays.SYMPTOM_STATE[]
+	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, CompleteInferenceNoDays
+			.SYMPTOM_STATE[]
 			symptomInformation, long hypothesis) {
 		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
 		for(int symptom = 0; symptom < symptomInformation.length; symptom++) {
-			switch (symptomInformation[symptom]) {
+			switch(symptomInformation[symptom]) {
 				case UNKOWN:
 					continue;//ignore unknown symptoms
 				case ABSENT:
@@ -57,6 +42,7 @@ public class MathUtils {
 
 	/**
 	 * Easier to calculate the negated probability than calculating positive probability. Use negative to get positive.
+	 *
 	 * @param probabilities [disease][symptom]
 	 */
 	public static double calculatePrOfNotSymptomGivenHypothesis(double[][] probabilities, int symptom, long
@@ -78,5 +64,21 @@ public class MathUtils {
 				result *= 1 - aPrioriProbabilities[disease];
 		}
 		return result;
+	}
+
+	private interface DistanceImpl {
+		double distance(double[] firstDistr, double[] secondDistr);
+	}
+
+	private static class BhattacharyyaDistance implements DistanceImpl {
+		@Override
+		public double distance(double[] firstDistr, double[] secondDistr) {
+			// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
+			double sum = 0;
+			for(int i = 0; i < firstDistr.length; i++) {
+				sum += Math.sqrt(firstDistr[i] * secondDistr[i]);
+			}
+			return - Math.log(sum);
+		}
 	}
 }

@@ -11,8 +11,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.*;
 
-public class Main extends Application{
+public class Main extends Application {
 	private static final Logger logger = Logger.getLogger("de.lehrbaum.masterthesis");
+	public static File loggerFile;
 
 	public static void main(String[] args) {
 		initializeLogging();
@@ -34,8 +35,6 @@ public class Main extends Application{
 		logger.setUseParentHandlers(false);
 	}
 
-	public static File loggerFile;
-
 	private static void setUpFileLogger() {
 		URL url = Main.class.getProtectionDomain().getCodeSource().getLocation();
 		try {
@@ -49,9 +48,9 @@ public class Main extends Application{
 			fileHandler.setLevel(Level.INFO);
 			mainLogger.addHandler(fileHandler);
 			loggerFile = logFile;
-		} catch (IOException e) {
+		} catch(IOException e) {
 			logger.log(Level.SEVERE, "Problem setting up logger.", e);
-		}catch (URISyntaxException e) {
+		} catch(URISyntaxException e) {
 			logger.severe("Problem with the program folder: " + url);
 		}
 	}

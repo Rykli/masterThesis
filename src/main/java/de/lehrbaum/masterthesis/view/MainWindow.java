@@ -13,7 +13,8 @@ public class MainWindow extends VBox {
 	private static final Logger logger = Logger.getLogger(MainWindow.class.getCanonicalName());
 
 	private TabPane tabPane;
-	public MainWindow () {
+
+	public MainWindow() {
 		super(10);
 		getStylesheets().add("/main_window_style.css");
 		setUpTabPane();
@@ -71,7 +72,7 @@ public class MainWindow extends VBox {
 		if(result.isPresent()) {
 			StringBuilder sb = new StringBuilder("[Feedback] ");
 			Node current = tabPane.getSelectionModel().getSelectedItem().getContent();
-			if (current instanceof LoggableViewState) {
+			if(current instanceof LoggableViewState) {
 				((LoggableViewState) current).appendViewState(sb);
 			}
 			sb.append("Message by user: ");

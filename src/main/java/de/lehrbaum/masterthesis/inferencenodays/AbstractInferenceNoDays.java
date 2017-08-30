@@ -10,7 +10,7 @@ import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.S
 /**
  * General inferencenodays for no days
  */
-public abstract class AbstractInferenceNoDays implements InferenceNoDays{
+public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 	/**
 	 * Contains probabilities at [disease][symptom].
 	 */
@@ -18,7 +18,7 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays{
 	/**
 	 * The a priori probabilities of the diseases.
 	 */
-	protected final double [] aPrioriProbabilities;
+	protected final double[] aPrioriProbabilities;
 	/**
 	 * The current probability for each disease.
 	 */

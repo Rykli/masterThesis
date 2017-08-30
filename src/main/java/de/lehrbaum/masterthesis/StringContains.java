@@ -3,7 +3,7 @@ package de.lehrbaum.masterthesis;
 public class StringContains {
 
 	//fast method for string contains
-	static String [][] cases = new String[][]{
+	static String[][] cases = new String[][] {
 			{"A", "A", "T"},
 			{"AB", "A", "T"},
 			{"BC", "A", "F"},
@@ -13,7 +13,7 @@ public class StringContains {
 
 	public static boolean doesStringContain(String s1, String s2) {
 		assert s1.length() >= s2.length();
-		int [] cycles = new int[s2.length()];
+		int[] cycles = new int[s2.length()];
 		String currentCycle = null;
 		for(int i = 1; i < s2.length(); i++) {
 			if(currentCycle != null) {
