@@ -9,15 +9,15 @@ import org.junit.Assert;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import static de.lehrbaum.masterthesis.AlgorithmConfiguration.BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1;
+import static de.lehrbaum.masterthesis.AlgorithmConfiguration.BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_2;
 import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.*;
-import static de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays.VARIANTS
-		.SYMPTOMS_CALCULATION_VARIANT_1;
-import static de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays.VARIANTS
-		.SYMPTOMS_CALCULATION_VARIANT_2;
 
+@SuppressWarnings("unused")//remains in case the test should be used again.
 public class SymptomProbabilityTests {
 
 	//@Test Test result: Variant 2 is stupid. It calculates less probability the more symptoms there are.
+
 	/**
 	 * Tests whether the symptom calculation variants differ in the calculated order.
 	 */

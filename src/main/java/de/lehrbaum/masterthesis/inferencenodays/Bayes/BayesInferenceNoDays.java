@@ -7,6 +7,7 @@ import de.lehrbaum.masterthesis.inferencenodays.StepByStepInferenceNoDays;
 import java.util.EnumSet;
 import java.util.logging.Logger;
 
+import static de.lehrbaum.masterthesis.AlgorithmConfiguration.BAYES_VARIANTS;
 import static de.lehrbaum.masterthesis.MathUtils.*;
 
 /**
@@ -17,25 +18,15 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(BayesInferenceNoDays.class.getCanonicalName());
 
-	public enum VARIANTS {
-		SYMPTOMS_CALCULATION_VARIANT_1,
-		/**
-		 * This variant is stupid it calculates lower numbers the more symptoms there are.
-		 */
-		SYMPTOMS_CALCULATION_VARIANT_2
-		;
-		public static final EnumSet<VARIANTS> defaultSet = EnumSet.of(SYMPTOMS_CALCULATION_VARIANT_1);
-	}
-
 	/**
 	 * The probability for each symptom.
 	 */
 	private double[][] symptomProbabilities;
 
-	private EnumSet<VARIANTS> variant;
+	private EnumSet<BAYES_VARIANTS> variant;
 
 	public BayesInferenceNoDays(double[][] probabilities, double [] aPrioriProbabilities,
-								EnumSet<VARIANTS> variant) {
+								EnumSet<BAYES_VARIANTS> variant) {//TODO: change second param
 		super(aPrioriProbabilities, probabilities);
 		this.variant = variant;
 		updateSymptomProbabilities(symptomsAnswered);
@@ -108,7 +99,7 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 	//endregion
 
 	private void updateSymptomProbabilities(SYMPTOM_STATE[] symptomsAnswered) {
-		if(variant.contains(VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1)) {
+		if(variant.contains(BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1)) {
 			/*
 			 * Pr[symptom|knownSymptoms]
 			 */
@@ -121,7 +112,7 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 				symptomProbabilities[symptom][0] = prob;
 				symptomProbabilities[symptom][1] = 1 - prob;
 			}
-		} else if(variant.contains(VARIANTS.SYMPTOMS_CALCULATION_VARIANT_2)) {
+		} else if(variant.contains(BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_2)) {
 			/*
 			 * Pr{symptom, knownSymptoms]
 			 */

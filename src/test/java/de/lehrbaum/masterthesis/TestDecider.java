@@ -16,7 +16,7 @@ public class TestDecider {
 	public void testDoesDeciderTerminate() {
 		for(int i = 0; i < 100; i++) {
 			BayesInferenceNoDays inference = new BayesInferenceNoDays(NoDaysDefaultData.probabilities,
-					NoDaysDefaultData.aPriorProbabilities, BayesInferenceNoDays.VARIANTS.defaultSet);
+					NoDaysDefaultData.aPriorProbabilities, null);
 			int questionToAsk = new QuestionDecider(inference).recommendedSymptomToAsk();
 			while (questionToAsk != - 1) {
 				inference.symptomAnswered(questionToAsk, (new Random()).nextBoolean());

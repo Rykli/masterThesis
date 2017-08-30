@@ -16,23 +16,18 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
-import javafx.util.StringConverter;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
+import static de.lehrbaum.masterthesis.AlgorithmConfiguration.BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1;
 import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.*;
-import static de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays.VARIANTS
-		.SYMPTOMS_CALCULATION_VARIANT_1;
 import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
 
 class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableViewState{
@@ -184,7 +179,7 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		tableView.getColumns().add(valueColumn);
 		valueColumn.setEditable(true);
 		valueColumn.setCellValueFactory(param -> Bindings.valueAt(aPrioriDiseaseProb, param.getValue()));
-		valueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+		valueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new ViewUtils.DoubleStringConverter()));
 		valueColumn.setOnEditCommit(event -> {
 			if(event.getNewValue() != null) {
 				aPrioriDiseaseProb.set(event.getRowValue(), event.getNewValue());
@@ -225,36 +220,6 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		AbsentToggleButton(ToggleGroup group) {
 			super(group);
 			getStyleClass().add("absent-button");
-		}
-	}
-
-	private class DoubleStringConverter extends StringConverter<Double> {
-
-		@Override
-		public String toString(Double d) {
-			return String.format("%.2f", d);
-		}
-
-		@Override
-		public Double fromString(String string) {
-			if(string == null)
-				return null;
-			string = string.trim();
-			if(string.isEmpty())
-				return null;
-			Double d;
-			try{
-				d = new Double(string);
-			} catch (NumberFormatException e) {
-				try{
-					NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
-					Number number = format.parse(string);
-					d = number.doubleValue();
-				} catch(ParseException e2) {
-					return null;
-				}
-			}
-			return d;
 		}
 	}
 

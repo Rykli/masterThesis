@@ -1,10 +1,9 @@
 package de.lehrbaum.masterthesis.inferencenodays;
 
-public class InferenceFactory {
-	/*public enum VARIANTS {
+import de.lehrbaum.masterthesis.AlgorithmConfiguration;
 
-	}*/
-	public static StepByStepInferenceNoDays getStepByStepInferenceNoDays(){
+public class InferenceFactory {
+	public static StepByStepInferenceNoDays getStepByStepInferenceNoDays(AlgorithmConfiguration config) {
 		return null;//Not yet implemented
 	}
 }

@@ -11,11 +11,11 @@ public abstract class NoDaysDefaultData {
             "Schmerzen bei Kauen", "Odynophagie/Ohrenschmerz beim Schlucken", "Druckschmerz Kiefergelenk",
             "Schmerzhafte Knoten periauriulär", "Ziehen am Ohr", "Stechender starker Schmerz", "Brennender Schmerz",
             "Jucken im Ohr", "Rauschen im Ohr", "Wattegefühl im Ohr", "Pfeifen im Ohr", "Schmatzendes Ohrgeräusch",
-            "Blubbern im Ohr", "Drehschwindel wie im Karussell", "Schwankendes/unsicheres Gefühl"};
+			"Blubbern im Ohr", "Drehschwindel wie im Karussell", "Schwankendes/unsicheres Gefühl"};//localize
 
     public static final String[] diseases = new String[]{
-            "Otitis externa", "AOM", "CMD", "TVS/PE", "Hörsturz",
-            "Cerumen obturans", "Zoster oticus", "GG-Verletzung", "COMM"};
+			"Otitis externa", "AOM", "CMD", "TVS/PE", "Hörsturz",//localize
+			"Cerumen obturans", "Zoster oticus", "GG-Verletzung", "COMM"};
 
     public static final double[][] probabilities = Stream.of(new double[][]{
             //			 0     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--localize-->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<SplitPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.lehrbaum.masterthesis.view.QuestionInitializationView"
+           dividerPositions="0.5" prefHeight="697.0" prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/8.0.121">
+    <GridPane styleClass="padded-container" stylesheets="@main_window_style.css" vgap="5" hgap="10">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="SOMETIMES"/>
+            <RowConstraints vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Label text="Alter"/>
+        <Slider fx:id="ageSlider" majorTickUnit="1.0" max="9.0" minorTickCount="0" showTickLabels="true"
+                showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1"/>
+        <Label text="Geschlecht" GridPane.rowIndex="1"/>
+        <ChoiceBox fx:id="genderBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="Bitte beschreiben sie die Probleme die sie vermuten lassen, dass sie eine Krankheit haben."
+               wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
+        <TextArea fx:id="initialProblemText" promptText="Schmerzen im Ohr, Druckgefühl" GridPane.columnSpan="2"
+                  GridPane.rowIndex="3"/>
+        <Button maxWidth="Infinity" onAction="#startPressed" text="Starten" GridPane.columnSpan="2"
+                GridPane.rowIndex="4"/>
+    </GridPane>
+    <GridPane styleClass="padded-container" stylesheets="@main_window_style.css" vgap="5" hgap="10">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="SOMETIMES"/>
+            <RowConstraints vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Label text="Wählen sie den Algorithmus aus der die Fragen errechnen soll." GridPane.columnSpan="2"/>
+        <ChoiceBox fx:id="questionAlgorithmChoice" maxWidth="Infinity" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
+        <TableView fx:id="aPrioriTable" GridPane.rowIndex="2" GridPane.columnSpan="2" editable="true">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Krankheit" editable="false" prefWidth="250"/>
+                <TableColumn fx:id="aPrioriColumn" text="A priori Wahrscheinlichkeit"/>
+            </columns>
+        </TableView>
+
+    </GridPane>
+</SplitPane>

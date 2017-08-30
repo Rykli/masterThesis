@@ -61,7 +61,7 @@ public class Main extends Application{
 		setUpFileLogger();// when running as application set up a file logger.
 		Scene scene = new Scene(new MainWindow(), 1100, 750);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Lehrbaum Master Thesis");
+		primaryStage.setTitle("Lehrbaum Master Thesis");//localize
 		primaryStage.show();
 	}
 }
