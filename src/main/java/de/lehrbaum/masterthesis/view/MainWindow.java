@@ -15,7 +15,7 @@ public class MainWindow extends VBox {
 	private TabPane tabPane;
 
 	public MainWindow() {
-		super(10);
+		super();
 		getStylesheets().add("/main_window_style.css");
 		setUpTabPane();
 		setUpFeedbackButton();

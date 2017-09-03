@@ -1,6 +1,7 @@
 package de.lehrbaum.masterthesis;
 
-import de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays;
+import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.DoubleStream;
 
@@ -9,19 +10,13 @@ import java.util.stream.DoubleStream;
  */
 public class MathUtils {
 
-	private static DistanceImpl distanceImpl = new BhattacharyyaDistance();
-
 	public static double[] normalize(double[] vector) {
 		double sum = DoubleStream.of(vector).sum();
 		return DoubleStream.of(vector).map(d -> d / sum).toArray();
 	}
 
-	public static double distance(double[] firstDistribution, double[] secondDistribution) {
-		assert firstDistribution.length == secondDistribution.length;
-		return distanceImpl.distance(firstDistribution, secondDistribution);
-	}
-
-	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, CompleteInferenceNoDays
+	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, InferenceNoDays
+			.CompleteInferenceNoDays
 			.SYMPTOM_STATE[]
 			symptomInformation, long hypothesis) {
 		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
@@ -66,19 +61,18 @@ public class MathUtils {
 		return result;
 	}
 
-	private interface DistanceImpl {
-		double distance(double[] firstDistr, double[] secondDistr);
+	public static double bhattacharyyaDistance(double[] firstDistr, double[] secondDistr) {
+		// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
+		double sum = 0;
+		for(int i = 0; i < firstDistr.length; i++) {
+			sum += Math.sqrt(firstDistr[i] * secondDistr[i]);
+		}
+		return - Math.log(sum);
 	}
 
-	private static class BhattacharyyaDistance implements DistanceImpl {
-		@Override
-		public double distance(double[] firstDistr, double[] secondDistr) {
-			// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
-			double sum = 0;
-			for(int i = 0; i < firstDistr.length; i++) {
-				sum += Math.sqrt(firstDistr[i] * secondDistr[i]);
-			}
-			return - Math.log(sum);
-		}
+	public static double entropy(@NotNull double[] distribution) {
+		return - DoubleStream.of(distribution)
+				.filter(value -> value != 0)//remove all 0 values, they don't work with log and are defined as 0
+				.map(pr -> pr * Math.log(pr)).sum();
 	}
 }

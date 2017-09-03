@@ -1,6 +1,6 @@
 package de.lehrbaum.masterthesis.view;
 
-import de.lehrbaum.masterthesis.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -33,7 +33,7 @@ import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.diseases;
 public class QuestionInitializationView implements Initializable {
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(QuestionInitializationView.class.getCanonicalName());
-	private final ObservableList<Double> aPrioriDiseaseProb;
+
 	@FXML private Slider ageSlider;
 	@FXML private ChoiceBox<Gender> genderBox;
 	@FXML private TextArea initialProblemText;
@@ -44,8 +44,12 @@ public class QuestionInitializationView implements Initializable {
 	private String[] ageStages = new String[] {"0-10", "10-20", "20-30", "30-40", "40-50",
 			"50-60", "60-70", "70-80", "80-90", "90+"};
 
+	private final ObservableList<Double> aPrioriDiseaseProb;
+	private AlgorithmConfiguration configuration;
+
 	private QuestionInitializationView(ObservableList<Double> aPrioriDiseaseProb) {
 		this.aPrioriDiseaseProb = aPrioriDiseaseProb;
+		configuration = new AlgorithmConfiguration();
 	}
 
 	//region set up UI
@@ -97,7 +101,7 @@ public class QuestionInitializationView implements Initializable {
 	private void setUpRightViewPart() {
 		questionAlgorithmChoice.setItems(
 				FXCollections.observableArrayList(AlgorithmConfiguration.QUESTION_ALGORITHM.values()));
-		questionAlgorithmChoice.getSelectionModel().select(AlgorithmConfiguration.QUESTION_ALGORITHM.defaultValue);
+		questionAlgorithmChoice.getSelectionModel().select(configuration.getQuestionAlgorithm());
 
 		List<Integer> items = IntStream.range(0, aPrioriDiseaseProb.size()).boxed().collect(Collectors.toList());
 		aPrioriTable.setItems(FXCollections.observableList(items));
@@ -130,5 +134,9 @@ public class QuestionInitializationView implements Initializable {
 		public String toString() {
 			return description;
 		}
+	}
+
+	public interface QuestionInitializedListener {
+		void startPressed(AlgorithmConfiguration configuration);
 	}
 }

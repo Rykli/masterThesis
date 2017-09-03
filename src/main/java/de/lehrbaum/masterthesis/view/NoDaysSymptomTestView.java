@@ -1,7 +1,8 @@
 package de.lehrbaum.masterthesis.view;
 
+import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
 import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
-import de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays;
+import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,16 +20,14 @@ import javafx.scene.layout.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
-import static de.lehrbaum.masterthesis.AlgorithmConfiguration.BAYES_VARIANTS.SYMPTOMS_CALCULATION_VARIANT_1;
 import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.*;
-import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
+import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableViewState {
 	private static final Logger logger = Logger.getLogger(NoDaysSymptomTestView.class.getCanonicalName());
@@ -53,17 +52,19 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 	private void updateValues() {
 		diseaseChart.getData().clear();
 		double[] aPrioriProbabilitiesArray = aPrioriDiseaseProb.stream().mapToDouble(Double::doubleValue).toArray();
-		CompleteInferenceNoDays inference = new BayesInferenceNoDays(probabilities, aPrioriProbabilitiesArray,
-				EnumSet.of(SYMPTOMS_CALCULATION_VARIANT_1));
+		InferenceNoDays.CompleteInferenceNoDays inference = new BayesInferenceNoDays(aPrioriProbabilitiesArray,
+				probabilities,
+
+				new AlgorithmConfiguration());
 		SYMPTOM_STATE[] symptomStates = getSymptomStates();
-		inference.calculateGivenAllAnswers(symptomStates);
+		inference.symptomsAnswered(symptomStates);
 		diseaseProbabilities = inference.getDiseaseProbabilities();
 		updateDiseaseChart();
 		updateSymptomProbabilities(inference);
 	}
 
 	@NotNull
-	private CompleteInferenceNoDays.SYMPTOM_STATE[] getSymptomStates() {
+	private InferenceNoDays.CompleteInferenceNoDays.SYMPTOM_STATE[] getSymptomStates() {
 		SYMPTOM_STATE[] symptomStates = new SYMPTOM_STATE[symptoms.length];
 		for(int i = 0; i < symptomStates.length; i++) {
 			Toggle t = symptomToggleGroups[i].getSelectedToggle();
@@ -91,7 +92,7 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 
 	//endregion
 
-	private void updateSymptomProbabilities(CompleteInferenceNoDays inference) {
+	private void updateSymptomProbabilities(InferenceNoDays.CompleteInferenceNoDays inference) {
 		for(int symptom = 0; symptom < symptoms.length; symptom++) {
 			double[] symptomProb = inference.probabilityOfSymptom(symptom);
 			symptomToggleButtons[symptom][0].setText(String.format("%.2f", symptomProb[0]));

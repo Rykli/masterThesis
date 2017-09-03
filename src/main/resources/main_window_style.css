@@ -19,6 +19,11 @@
     -fx-bar-fill: darkolivegreen;
 }
 
+/* .default-color8 does not work, that stops working at 7. */
+.series9.chart-bar {
+    -fx-bar-fill: black;
+}
+
 .padded-container {
     -fx-padding: 10;
 }
