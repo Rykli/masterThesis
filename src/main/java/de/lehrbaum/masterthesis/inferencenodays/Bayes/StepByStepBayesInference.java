@@ -18,7 +18,7 @@ public class StepByStepBayesInference extends AbstractInferenceNoDays implements
 	}
 
 	@Override
-	public void symptomAnswered(int symptom, boolean has) {
+	public void symptomAnswered(int symptom, SYMPTOM_STATE state) {
 
 	}
 

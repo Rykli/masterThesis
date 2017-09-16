@@ -20,6 +20,6 @@ public class AlgorithmFactory {
 	public static QuestionDeciderNoDays getQuestionDecider(@NotNull InferenceNoDays.StepByStepInferenceNoDays
 																   inference,
 														   @NotNull AlgorithmConfiguration configuration) {
-		return new QuestionDeciderNoDays(inference, configuration);
+		return new QuestionDeciderNoDays(inference, configuration, configuration.getGainLimit());
 	}
 }

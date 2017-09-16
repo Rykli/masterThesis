@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE.UNKOWN;
-
 /**
  * General inferencenodays for no days
  */
@@ -23,7 +21,6 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 	 */
 	protected double[] currentProbabilities;
 
-	@NotNull
 	protected SYMPTOM_STATE[] symptomsStates;
 
 	@NotNull
@@ -36,7 +33,6 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 		this.probabilities = probabilities;
 		this.configuration = configuration;
 		symptomsStates = new SYMPTOM_STATE[probabilities[0].length];
-		Arrays.fill(symptomsStates, UNKOWN);
 	}
 
 	@Override
@@ -45,7 +41,7 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 	}
 
 	public boolean wasSymptomAnswered(int symptom) {
-		return symptomsStates[symptom] != UNKOWN;
+		return symptomsStates[symptom] != null;
 	}
 
 	protected int amountSymptoms() {
@@ -54,5 +50,11 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 
 	protected int amountDiseases() {
 		return probabilities.length;
+	}
+
+	@Override
+	public String toString() {
+		return "The symptom states: " + Arrays.toString(symptomsStates) +
+				"\nThe current probabilities: " + Arrays.toString(currentProbabilities);
 	}
 }

@@ -35,6 +35,15 @@ public class Main extends Application {
 		logger.setUseParentHandlers(false);
 	}
 
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		setUpFileLogger();// when running as application set up a file logger.
+		Scene scene = new Scene(new MainWindow(), 1100, 750);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Lehrbaum Master Thesis");//localize
+		primaryStage.show();
+	}
+
 	private static void setUpFileLogger() {
 		URL url = Main.class.getProtectionDomain().getCodeSource().getLocation();
 		try {
@@ -53,14 +62,5 @@ public class Main extends Application {
 		} catch(URISyntaxException e) {
 			logger.severe("Problem with the program folder: " + url);
 		}
-	}
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		setUpFileLogger();// when running as application set up a file logger.
-		Scene scene = new Scene(new MainWindow(), 1100, 750);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Lehrbaum Master Thesis");//localize
-		primaryStage.show();
 	}
 }

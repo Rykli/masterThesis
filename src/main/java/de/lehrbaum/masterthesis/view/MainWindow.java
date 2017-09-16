@@ -29,6 +29,13 @@ public class MainWindow extends VBox {
 		setUpTap2();
 	}
 
+	private void setUpFeedbackButton() {
+		Button b = new Button("Rückmeldung");//localize
+		b.setMaxWidth(Double.POSITIVE_INFINITY);
+		getChildren().add(b);
+		b.setOnAction(event -> feedbackPressed());
+	}
+
 	private void setUpTap1() {
 		NoDaysSymptomTestView view = new NoDaysSymptomTestView();
 		Tab tab = new Tab("Symptomtest", view);//localize
@@ -40,13 +47,6 @@ public class MainWindow extends VBox {
 		Tab tab = new Tab("Fragen test", new QuestionView());//localize
 		tab.setClosable(false);
 		tabPane.getTabs().add(tab);
-	}
-
-	private void setUpFeedbackButton() {
-		Button b = new Button("Rückmeldung");//localize
-		b.setMaxWidth(Double.POSITIVE_INFINITY);
-		getChildren().add(b);
-		b.setOnAction(event -> feedbackPressed());
 	}
 
 	private void feedbackPressed() {
@@ -75,7 +75,7 @@ public class MainWindow extends VBox {
 			if(current instanceof LoggableViewState) {
 				((LoggableViewState) current).appendViewState(sb);
 			}
-			sb.append("Message by user: ");
+			sb.append("\nMessage by user: ");
 			sb.append(result.get());
 			logger.info(sb.toString());
 		}

@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
-import javafx.geometry.Side;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -39,9 +38,6 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 
 	private ObservableList<Double> aPrioriDiseaseProb;
 
-	//region Update views
-
-	//region building the view
 	NoDaysSymptomTestView() {
 		super();
 		Double[] boxedArray = DoubleStream.of(aPriorProbabilities).boxed().toArray(Double[]::new);
@@ -49,18 +45,12 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		setUpUserInterface();
 	}
 
-	private void updateValues() {
-		diseaseChart.getData().clear();
-		double[] aPrioriProbabilitiesArray = aPrioriDiseaseProb.stream().mapToDouble(Double::doubleValue).toArray();
-		InferenceNoDays.CompleteInferenceNoDays inference = new BayesInferenceNoDays(aPrioriProbabilitiesArray,
-				probabilities,
-
-				new AlgorithmConfiguration());
-		SYMPTOM_STATE[] symptomStates = getSymptomStates();
-		inference.symptomsAnswered(symptomStates);
-		diseaseProbabilities = inference.getDiseaseProbabilities();
-		updateDiseaseChart();
-		updateSymptomProbabilities(inference);
+	@Override
+	public void appendViewState(StringBuilder sb) {
+		sb.append("[Symptom test view] Symptoms selected: ");
+		sb.append(Arrays.toString(getSymptomStates()));
+		sb.append("\nCalculated values: ");
+		sb.append(Arrays.toString(diseaseProbabilities));
 	}
 
 	@NotNull
@@ -80,7 +70,19 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		return symptomStates;
 	}
 
+	private void updateValues() {
+		double[] aPrioriProbabilitiesArray = aPrioriDiseaseProb.stream().mapToDouble(Double::doubleValue).toArray();
+		InferenceNoDays.CompleteInferenceNoDays inference = new BayesInferenceNoDays(aPrioriProbabilitiesArray,
+				probabilities, new AlgorithmConfiguration());
+		SYMPTOM_STATE[] symptomStates = getSymptomStates();
+		inference.symptomsAnswered(symptomStates);
+		diseaseProbabilities = inference.getDiseaseProbabilities();
+		updateDiseaseChart();
+		updateSymptomProbabilities(inference);
+	}
+
 	private void updateDiseaseChart() {
+		diseaseChart.getData().clear();
 		for(int disease = 0; disease < diseases.length; disease++) {
 			String diseaseName = diseases[disease];
 			XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -89,8 +91,6 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 			diseaseChart.getData().add(series);
 		}
 	}
-
-	//endregion
 
 	private void updateSymptomProbabilities(InferenceNoDays.CompleteInferenceNoDays inference) {
 		for(int symptom = 0; symptom < symptoms.length; symptom++) {
@@ -194,21 +194,11 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		final NumberAxis yAxis = new NumberAxis();
 		final BarChart<String, Number> bc =
 				new BarChart<>(xAxis, yAxis);
-		bc.setTitle("Disease probabilities");
-		xAxis.setLabel("Disease");
-		yAxis.setLabel("Probability");
-		bc.setLegendSide(Side.BOTTOM);
+		bc.setTitle("Wahrscheinlichkeiten der Krankheiten");
+		xAxis.setLabel("Krankheit");
+		yAxis.setLabel("Wahrscheinlichkeit");
 		bc.setAnimated(false);
 		return bc;
-	}
-
-	@Override
-	public void appendViewState(StringBuilder sb) {
-		sb.append("[Symptom test view] Symptoms selected: ");
-		sb.append(Arrays.toString(getSymptomStates()));
-		sb.append("\nCalculated values: ");
-		sb.append(Arrays.toString(diseaseProbabilities));
-		sb.append('\n');
 	}
 
 	private class BaseCustomToggleButton extends ToggleButton {
@@ -225,8 +215,6 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 		}
 
 	}
-
-	//endregion
 
 	private class AbsentToggleButton extends BaseCustomToggleButton {
 		AbsentToggleButton(ToggleGroup group) {

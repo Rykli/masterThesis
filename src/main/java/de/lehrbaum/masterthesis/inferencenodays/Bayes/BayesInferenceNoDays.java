@@ -34,27 +34,12 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		updateSymptomProbabilities(symptomsStates);
 	}
 
-	private void updateSymptomProbabilities(SYMPTOM_STATE[] symptomsAnswered) {
-		symptomProbabilities = new double[amountSymptoms()][2];
-		for(int symptom = 0; symptom < amountSymptoms(); symptom++) {
-			if(wasSymptomAnswered(symptom))
-				continue;
-
-			double prob = 0;
-			switch(configuration.getBayesSymptomsCalculationVariant()) {
-				case BAYES_SYMPTOMS_CALCULATION_VARIANT_1:
-					//important to use the current probabilities here
-					prob = calculateProbabilityOfSymptom(currentProbabilities, probabilities, symptom);
-					break;
-				case BAYES_SYMPTOMS_CALCULATION_VARIANT_2:
-					SYMPTOM_STATE[] symptomInformation = symptomsAnswered.clone();
-					symptomInformation[symptom] = SYMPTOM_STATE.PRESENT;
-					prob = calculatePrOfSymptoms(aPrioriProbabilities, probabilities, symptomInformation);
-					break;
-			}
-			symptomProbabilities[symptom][0] = prob;
-			symptomProbabilities[symptom][1] = 1 - prob;
-		}
+	@Override
+	public void symptomAnswered(int symptom, SYMPTOM_STATE state) {
+		assert ! wasSymptomAnswered(symptom);
+		symptomsStates[symptom] = state;
+		if(state != SYMPTOM_STATE.UNKOWN)
+			symptomsAnswered(symptomsStates);
 	}
 
 	private static double calculateProbabilityOfSymptom(double[] aPrioriProbabilities, double[][] probabilities, int
@@ -93,6 +78,87 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		return sum;
 	}
 
+	@Override
+	public double[] probabilityOfSymptom(int symptom) {
+		return symptomProbabilities[symptom];
+	}
+
+	@Override
+	public void symptomsAnswered(SYMPTOM_STATE[] symptomInformation) {
+		if(configuration.getNormalize())
+			currentProbabilities = MathUtils.normalize(calculateGivenAllSymptomStates(symptomInformation));
+		else
+			currentProbabilities = calculateGivenAllSymptomStates(symptomInformation);
+
+		//mark the symptoms as answered that are not unknown
+		this.symptomsStates = symptomInformation;
+
+		updateSymptomProbabilities(symptomInformation);
+	}
+
+	private double[] calculateGivenAllSymptomStates(SYMPTOM_STATE[] symptomInformation) {
+		/*
+		 * Want to calculate the probability that a disease d_i is present given a set of symptoms S.
+		 * P(d_i | S) = nominator / denominator where
+		 * nominator = sum (of all Combinations of diseases H where d_i is active) of P(F|H)*P(H)
+		 * denominator = sum (of all Combinations of diseases H) of P(F|H)*P(H)
+		 *
+		 * The terms P(F|H) and P(H) will be explained in the subfunctions.
+		 *
+		 * Since the denominator already calculates all summands necessary for the nominators, they will be calculated
+		 * as part of the denominator calculation.
+		 */
+		double[] diseaseNominators = new double[aPrioriProbabilities.length];
+		double denominator
+				= calculateNominatorDenominator(symptomInformation, diseaseNominators);
+		for(int disease = 0; disease < diseaseNominators.length; disease++)
+			diseaseNominators[disease] /= denominator;
+		return diseaseNominators;
+	}
+
+	@Override
+	public double[] simulateSymptomAnswered(int symptom, boolean has) {
+		assert symptomsStates[symptom] == null;
+		symptomsStates[symptom] = has ? SYMPTOM_STATE.PRESENT : SYMPTOM_STATE.ABSENT;
+		double[] newProbabilities = calculateGivenAllSymptomStates(symptomsStates);
+		symptomsStates[symptom] = null;
+		if(configuration.getNormalize())
+			return MathUtils.normalize(newProbabilities);
+		else
+			return newProbabilities;
+	}
+
+	@Override
+	public String toString() {
+		return configuration.toString() +
+				"\nBayes inference no days:\n" +
+				super.toString();
+	}
+
+	private void updateSymptomProbabilities(SYMPTOM_STATE[] symptomsAnswered) {
+		symptomProbabilities = new double[amountSymptoms()][2];
+		for(int symptom = 0; symptom < amountSymptoms(); symptom++) {
+			if(symptomsStates[symptom] == SYMPTOM_STATE.PRESENT
+					|| symptomsStates[symptom] == SYMPTOM_STATE.ABSENT)
+				continue;
+
+			double prob = 0;
+			switch(configuration.getBayesSymptomsCalculationVariant()) {
+				case BAYES_SYMPTOMS_CALCULATION_VARIANT_1:
+					//important to use the current probabilities here
+					prob = calculateProbabilityOfSymptom(currentProbabilities, probabilities, symptom);
+					break;
+				case BAYES_SYMPTOMS_CALCULATION_VARIANT_2:
+					SYMPTOM_STATE[] symptomInformation = symptomsAnswered.clone();
+					symptomInformation[symptom] = SYMPTOM_STATE.PRESENT;
+					prob = calculatePrOfSymptoms(aPrioriProbabilities, probabilities, symptomInformation);
+					break;
+			}
+			symptomProbabilities[symptom][0] = prob;
+			symptomProbabilities[symptom][1] = 1 - prob;
+		}
+	}
+
 	private double calculateNominatorDenominator(CompleteInferenceNoDays.SYMPTOM_STATE[] symptomInformation,
 												 double[] diseaseNominators) {
 		/*
@@ -123,62 +189,5 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 			}
 		}
 		return denominator;
-	}
-
-	@Override
-	public void symptomAnswered(int symptom, boolean has) {
-		assert ! wasSymptomAnswered(symptom);
-		symptomsStates[symptom] = has ? SYMPTOM_STATE.PRESENT : SYMPTOM_STATE.ABSENT;
-		symptomsAnswered(symptomsStates);
-	}
-
-	@Override
-	public void symptomsAnswered(SYMPTOM_STATE[] symptomInformation) {
-		if(configuration.getNormalize())
-			currentProbabilities = MathUtils.normalize(calculateGivenAllSymptomStates(symptomInformation));
-		else
-			currentProbabilities = calculateGivenAllSymptomStates(symptomInformation);
-
-		//mark the symptoms as answered that are not unknown
-		this.symptomsStates = symptomInformation;
-
-		updateSymptomProbabilities(symptomInformation);
-	}
-
-	@Override
-	public double[] probabilityOfSymptom(int symptom) {
-		return symptomProbabilities[symptom];
-	}
-
-	private double[] calculateGivenAllSymptomStates(SYMPTOM_STATE[] symptomInformation) {
-		/*
-		 * Want to calculate the probability that a disease d_i is present given a set of symptoms S.
-		 * P(d_i | S) = nominator / denominator where
-		 * nominator = sum (of all Combinations of diseases H where d_i is active) of P(F|H)*P(H)
-		 * denominator = sum (of all Combinations of diseases H) of P(F|H)*P(H)
-		 *
-		 * The terms P(F|H) and P(H) will be explained in the subfunctions.
-		 *
-		 * Since the denominator already calculates all summands necessary for the nominators, they will be calculated
-		 * as part of the denominator calculation.
-		 */
-		double[] diseaseNominators = new double[aPrioriProbabilities.length];
-		double denominator
-				= calculateNominatorDenominator(symptomInformation, diseaseNominators);
-		for(int disease = 0; disease < diseaseNominators.length; disease++)
-			diseaseNominators[disease] /= denominator;
-		return diseaseNominators;
-	}
-
-	@Override
-	public double[] simulateSymptomAnswered(int symptom, boolean has) {
-		assert symptomsStates[symptom] == SYMPTOM_STATE.UNKOWN;
-		symptomsStates[symptom] = has ? SYMPTOM_STATE.PRESENT : SYMPTOM_STATE.ABSENT;
-		double[] newProbabilities = calculateGivenAllSymptomStates(symptomsStates);
-		symptomsStates[symptom] = SYMPTOM_STATE.UNKOWN;
-		if(configuration.getNormalize())
-			return MathUtils.normalize(newProbabilities);
-		else
-			return newProbabilities;
 	}
 }

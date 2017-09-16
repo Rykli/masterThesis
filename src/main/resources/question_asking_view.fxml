@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<SplitPane xmlns:fx="http://javafx.com/fxml/1" dividerPositions="0.5" prefHeight="697.0" prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/8.0.121" fx:controller="de.lehrbaum.masterthesis.view.QuestionAskingView">
+    <VBox alignment="CENTER" spacing="5">
+        <Label fx:id="questionLabel" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
+        <Button defaultButton="true" maxWidth="Infinity" onAction="#yesPressed" text="Ja"/>
+        <Button maxWidth="Infinity" onAction="#noPressed" text="Nein"/>
+        <Button maxWidth="Infinity" onAction="#unknownPressed" text="Unbekannt"/>
+        <Button cancelButton="true" maxWidth="Infinity" onAction="#backPressed" text="Zurück zum start"/>
+    </VBox>
+    <VBox>
+        <!-- localize -->
+        <BarChart fx:id="diseaseChart" animated="false" title="Wahrscheinlichkeiten der Krankheiten">
+            <xAxis>
+                <CategoryAxis side="BOTTOM" label="Krankheit"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT" label="Wahrscheinlichkeit"/>
+            </yAxis>
+        </BarChart>
+    </VBox>
+</SplitPane>

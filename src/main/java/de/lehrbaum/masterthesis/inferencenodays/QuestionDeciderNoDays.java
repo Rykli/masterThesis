@@ -20,8 +20,10 @@ public class QuestionDeciderNoDays {
 	double gainOfRecommendedQuestion = Double.MAX_VALUE;
 	private QuestionGainEvaluator gainEvaluator;
 	private StepByStepInferenceNoDays inferenceNoDays;
+	private double gainLimit;
 
-	QuestionDeciderNoDays(StepByStepInferenceNoDays inference, AlgorithmConfiguration configuration) {
+	QuestionDeciderNoDays(StepByStepInferenceNoDays inference, AlgorithmConfiguration configuration, double
+			gainLimit) {
 		switch(configuration.getQuestionAlgorithm()) {
 			case MINIMIZE_EXPECTED_ENTROPY:
 				gainEvaluator = new MinimizeExpectedEntropy();
@@ -31,6 +33,7 @@ public class QuestionDeciderNoDays {
 				break;
 		}
 		this.inferenceNoDays = inference;
+		this.gainLimit = gainLimit;
 	}
 
 	/**
@@ -53,6 +56,9 @@ public class QuestionDeciderNoDays {
 
 		//if the gain is to low consider stop asking
 		logger.finer("Question decided: " + questionToAsk + " with expected gain: " + bestGain);
+
+		if(bestGain < gainLimit)
+			questionToAsk = - 1;
 
 		return questionToAsk;
 	}

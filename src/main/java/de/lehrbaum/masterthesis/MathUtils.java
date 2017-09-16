@@ -1,9 +1,10 @@
 package de.lehrbaum.masterthesis;
 
-import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.DoubleStream;
+
+import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 /**
  * Contains general purpose mathematical functions.
@@ -15,21 +16,20 @@ public class MathUtils {
 		return DoubleStream.of(vector).map(d -> d / sum).toArray();
 	}
 
-	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, InferenceNoDays
-			.CompleteInferenceNoDays
-			.SYMPTOM_STATE[]
-			symptomInformation, long hypothesis) {
+	public static double calculatePrOfSymptomsGivenHypothesis(
+			double[][] probabilities, SYMPTOM_STATE[] symptomInformation, long hypothesis) {
 		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
 		for(int symptom = 0; symptom < symptomInformation.length; symptom++) {
+			if(symptomInformation[symptom] == null)
+				continue;
 			switch(symptomInformation[symptom]) {
-				case UNKOWN:
-					continue;//ignore unknown symptoms
 				case ABSENT:
 					result *= calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
 					break;
 				case PRESENT:
 					result *= 1 - calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
 					break;
+				//ignore UNKOWN Symptoms
 			}
 		}
 		return result;
