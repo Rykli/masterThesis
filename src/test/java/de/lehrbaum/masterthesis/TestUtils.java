@@ -1,8 +1,9 @@
 package de.lehrbaum.masterthesis;
 
-import de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
-
 import java.util.Random;
+import java.util.logging.*;
+
+import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 public class TestUtils {
 	/**
@@ -26,5 +27,23 @@ public class TestUtils {
 			}
 		}
 		return symptomStates;
+	}
+
+	/**
+	 * Since tests don't use the Main class the logging will not be initialized by default but has to be done extra.
+	 */
+	public static void initializeTestLogging() {
+		Logger logger = Logger.getLogger(TestUtils.class.getPackage().getName());
+		StreamHandler handler = new StreamHandler(System.out, new SimpleFormatter()) {
+			@Override
+			public synchronized void publish(final LogRecord record) {
+				super.publish(record);
+				flush();
+			}
+		};
+		handler.setLevel(Level.ALL);
+		logger.addHandler(handler);
+		logger.setLevel(Level.ALL);
+		logger.setUseParentHandlers(false);
 	}
 }

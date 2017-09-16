@@ -4,13 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE;
-import static de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays.SYMPTOM_STATE.UNKOWN;
-
 /**
  * General inferencenodays for no days
  */
-public abstract class AbstractInferenceNoDays implements InferenceNoDays{
+public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 	/**
 	 * Contains probabilities at [disease][symptom].
 	 */
@@ -18,20 +15,24 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays{
 	/**
 	 * The a priori probabilities of the diseases.
 	 */
-	protected final double [] aPrioriProbabilities;
+	protected final double[] aPrioriProbabilities;
 	/**
 	 * The current probability for each disease.
 	 */
 	protected double[] currentProbabilities;
 
-	@NotNull
-	protected SYMPTOM_STATE[] symptomsAnswered;
+	protected SYMPTOM_STATE[] symptomsStates;
 
-	public AbstractInferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities) {
+	@NotNull
+	protected AlgorithmConfiguration configuration;
+
+	public AbstractInferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities, @NotNull
+			AlgorithmConfiguration
+			configuration) {
 		currentProbabilities = this.aPrioriProbabilities = aPrioriProbabilities;
 		this.probabilities = probabilities;
-		symptomsAnswered = new SYMPTOM_STATE[probabilities[0].length];
-		Arrays.fill(symptomsAnswered, UNKOWN);
+		this.configuration = configuration;
+		symptomsStates = new SYMPTOM_STATE[probabilities[0].length];
 	}
 
 	@Override
@@ -40,14 +41,20 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays{
 	}
 
 	public boolean wasSymptomAnswered(int symptom) {
-		return symptomsAnswered[symptom] != UNKOWN;
+		return symptomsStates[symptom] != null;
 	}
 
 	protected int amountSymptoms() {
-		return symptomsAnswered.length;
+		return symptomsStates.length;
 	}
 
 	protected int amountDiseases() {
 		return probabilities.length;
+	}
+
+	@Override
+	public String toString() {
+		return "The symptom states: " + Arrays.toString(symptomsStates) +
+				"\nThe current probabilities: " + Arrays.toString(currentProbabilities);
 	}
 }

@@ -1,55 +1,35 @@
 package de.lehrbaum.masterthesis;
 
-import de.lehrbaum.masterthesis.inferencenodays.CompleteInferenceNoDays;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.DoubleStream;
+
+import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 /**
  * Contains general purpose mathematical functions.
  */
 public class MathUtils {
 
-	private static DistanceImpl distanceImpl = new BhattacharyyaDistance();
-
-	public static double [] normalize(double [] vector) {
+	public static double[] normalize(double[] vector) {
 		double sum = DoubleStream.of(vector).sum();
-		return DoubleStream.of(vector).map(d -> d/sum).toArray();
+		return DoubleStream.of(vector).map(d -> d / sum).toArray();
 	}
 
-	public static double distance(double [] firstDistribution, double[] secondDistribution) {
-		assert firstDistribution.length == secondDistribution.length;
-		return distanceImpl.distance(firstDistribution, secondDistribution);
-	}
-
-	private interface DistanceImpl {
-		double distance(double[] firstDistr, double[] secondDistr);
-	}
-
-	private static class BhattacharyyaDistance implements DistanceImpl {
-		@Override
-		public double distance(double[] firstDistr, double[] secondDistr) {
-			// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
-			double sum = 0;
-			for(int i = 0; i < firstDistr.length; i++) {
-				sum += Math.sqrt(firstDistr[i]*secondDistr[i]);
-			}
-			return -Math.log(sum);
-		}
-	}
-
-	public static double calculatePrOfSymptomsGivenHypothesis(double[][] probabilities, CompleteInferenceNoDays.SYMPTOM_STATE[]
-			symptomInformation, long hypothesis) {
+	public static double calculatePrOfSymptomsGivenHypothesis(
+			double[][] probabilities, SYMPTOM_STATE[] symptomInformation, long hypothesis) {
 		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
 		for(int symptom = 0; symptom < symptomInformation.length; symptom++) {
-			switch (symptomInformation[symptom]) {
-				case UNKOWN:
-					continue;//ignore unknown symptoms
+			if(symptomInformation[symptom] == null)
+				continue;
+			switch(symptomInformation[symptom]) {
 				case ABSENT:
 					result *= calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
 					break;
 				case PRESENT:
 					result *= 1 - calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
 					break;
+				//ignore UNKOWN Symptoms
 			}
 		}
 		return result;
@@ -57,6 +37,7 @@ public class MathUtils {
 
 	/**
 	 * Easier to calculate the negated probability than calculating positive probability. Use negative to get positive.
+	 *
 	 * @param probabilities [disease][symptom]
 	 */
 	public static double calculatePrOfNotSymptomGivenHypothesis(double[][] probabilities, int symptom, long
@@ -78,5 +59,20 @@ public class MathUtils {
 				result *= 1 - aPrioriProbabilities[disease];
 		}
 		return result;
+	}
+
+	public static double bhattacharyyaDistance(double[] firstDistr, double[] secondDistr) {
+		// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))
+		double sum = 0;
+		for(int i = 0; i < firstDistr.length; i++) {
+			sum += Math.sqrt(firstDistr[i] * secondDistr[i]);
+		}
+		return - Math.log(sum);
+	}
+
+	public static double entropy(@NotNull double[] distribution) {
+		return - DoubleStream.of(distribution)
+				.filter(value -> value != 0)//remove all 0 values, they don't work with log and are defined as 0
+				.map(pr -> pr * Math.log(pr)).sum();
 	}
 }

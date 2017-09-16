@@ -13,7 +13,8 @@ public class MainWindow extends VBox {
 	private static final Logger logger = Logger.getLogger(MainWindow.class.getCanonicalName());
 
 	private TabPane tabPane;
-	public MainWindow () {
+
+	public MainWindow() {
 		super();
 		getStylesheets().add("/main_window_style.css");
 		setUpTabPane();
@@ -28,29 +29,31 @@ public class MainWindow extends VBox {
 		setUpTap2();
 	}
 
+	private void setUpFeedbackButton() {
+		Button b = new Button("Rückmeldung");//localize
+		b.setMaxWidth(Double.POSITIVE_INFINITY);
+		getChildren().add(b);
+		b.setOnAction(event -> feedbackPressed());
+	}
+
 	private void setUpTap1() {
 		NoDaysSymptomTestView view = new NoDaysSymptomTestView();
-		Tab tab = new Tab("Symptomtest", view);
+		Tab tab = new Tab("Symptomtest", view);//localize
 		tab.setClosable(false);
 		tabPane.getTabs().add(tab);
 	}
 
 	private void setUpTap2() {
-
-	}
-
-	private void setUpFeedbackButton() {
-		Button b = new Button("Rückmeldung");
-		b.setMaxWidth(Double.POSITIVE_INFINITY);
-		getChildren().add(b);
-		b.setOnAction(event -> feedbackPressed());
+		Tab tab = new Tab("Fragen test", new QuestionView());//localize
+		tab.setClosable(false);
+		tabPane.getTabs().add(tab);
 	}
 
 	private void feedbackPressed() {
 		if(Main.loggerFile == null) {
 			//this means the file logger could not be set up correctly.
 			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Error Dialog");
+			alert.setTitle("Error Dialog");//localize
 			alert.setHeaderText("Es gab ein problem mit der Protokoll Datei.");
 			alert.setContentText("Es konnte keine Protokoll Datei erstellt werden. Bitte stellen sie sicher, dass" +
 					" der Ordner in dem sich das Programm befindet nicht Schreibgeschützt ist.");
@@ -60,7 +63,7 @@ public class MainWindow extends VBox {
 
 		//get user feedback and then log it.
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("Rückmeldung speichern");
+		dialog.setTitle("Rückmeldung speichern");//localize
 		dialog.setHeaderText("Der eingegebene Text wird zusammen mit Informationen über den aktuellen Zustand des " +
 				"Programms\nin der Datei " + Main.loggerFile + " abgespeichert.");
 		dialog.setContentText("Bitte geben sie ihre Rückmeldung ein:");
@@ -69,10 +72,10 @@ public class MainWindow extends VBox {
 		if(result.isPresent()) {
 			StringBuilder sb = new StringBuilder("[Feedback] ");
 			Node current = tabPane.getSelectionModel().getSelectedItem().getContent();
-			if (current instanceof LoggableViewState) {
+			if(current instanceof LoggableViewState) {
 				((LoggableViewState) current).appendViewState(sb);
 			}
-			sb.append("Message by user: ");
+			sb.append("\nMessage by user: ");
 			sb.append(result.get());
 			logger.info(sb.toString());
 		}
