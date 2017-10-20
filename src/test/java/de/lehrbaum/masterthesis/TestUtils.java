@@ -1,9 +1,9 @@
 package de.lehrbaum.masterthesis;
 
+import de.lehrbaum.masterthesis.data.Answer;
+
 import java.util.Random;
 import java.util.logging.*;
-
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 public class TestUtils {
 	/**
@@ -11,19 +11,19 @@ public class TestUtils {
 	 * So this method can generate random cases
 	 * @return A random symptom state using {@link java.util.Random}.
 	 */
-	public static SYMPTOM_STATE [] getRandomSymptomState(int amountSymptoms) {
-		SYMPTOM_STATE[] symptomStates = new SYMPTOM_STATE[amountSymptoms];
+	public static Answer [] getRandomSymptomState(int amountSymptoms) {
+		Answer[] symptomStates = new Answer[amountSymptoms];
 		Random r = new Random();
 		for(int symptom = 0; symptom < amountSymptoms; symptom++) {
 			switch (r.nextInt(3)) {
 				case 0:
-					symptomStates[symptom] = SYMPTOM_STATE.UNKOWN;
+					symptomStates[symptom] = Answer.NOT_ANSWERED;
 					break;
 				case 1:
-					symptomStates[symptom] = SYMPTOM_STATE.PRESENT;
+					symptomStates[symptom] = Answer.PRESENT;
 					break;
 				case 2:
-					symptomStates[symptom] = SYMPTOM_STATE.ABSENT;
+					symptomStates[symptom] = Answer.ABSENT;
 			}
 		}
 		return symptomStates;

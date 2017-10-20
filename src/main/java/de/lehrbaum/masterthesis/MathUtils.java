@@ -1,10 +1,9 @@
 package de.lehrbaum.masterthesis;
 
+import de.lehrbaum.masterthesis.data.Answer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.DoubleStream;
-
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE;
 
 /**
  * Contains general purpose mathematical functions.
@@ -17,7 +16,7 @@ public class MathUtils {
 	}
 
 	public static double calculatePrOfSymptomsGivenHypothesis(
-			double[][] probabilities, SYMPTOM_STATE[] symptomInformation, long hypothesis) {
+			double[][] probabilities, Answer[] symptomInformation, long hypothesis) {
 		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
 		for(int symptom = 0; symptom < symptomInformation.length; symptom++) {
 			if(symptomInformation[symptom] == null)

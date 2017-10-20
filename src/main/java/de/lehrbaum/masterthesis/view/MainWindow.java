@@ -1,8 +1,11 @@
 package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.Main;
+import de.lehrbaum.masterthesis.data.DataProviderImplementation;
+import de.lehrbaum.masterthesis.exceptions.ExcelLoadException;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -18,7 +21,7 @@ public class MainWindow extends VBox {
 		super();
 		getStylesheets().add("/main_window_style.css");
 		setUpTabPane();
-		setUpFeedbackButton();
+		setUpButtons();
 	}
 
 	private void setUpTabPane() {
@@ -29,11 +32,17 @@ public class MainWindow extends VBox {
 		setUpTap2();
 	}
 
-	private void setUpFeedbackButton() {
+	private void setUpButtons() {
+		SplitPane container = new SplitPane();
+		getChildren().add(container);
 		Button b = new Button("Rückmeldung");//localize
 		b.setMaxWidth(Double.POSITIVE_INFINITY);
-		getChildren().add(b);
+		container.getItems().add(b);
 		b.setOnAction(event -> feedbackPressed());
+		b = new Button("Excel neuladen");//localize
+		b.setMaxWidth(Double.POSITIVE_INFINITY);
+		container.getItems().add(b);
+		b.setOnAction(event -> reloadPressed());
 	}
 
 	private void setUpTap1() {
@@ -47,6 +56,20 @@ public class MainWindow extends VBox {
 		Tab tab = new Tab("Fragen test", new QuestionView());//localize
 		tab.setClosable(false);
 		tabPane.getTabs().add(tab);
+	}
+
+	private void reloadPressed() {
+		try {
+			DataProviderImplementation.getInstance().resetInformation();
+		} catch(ExcelLoadException e) {
+			ViewUtils.showErrorMessage(e, getScene());
+			return;
+		}
+
+		Node current = tabPane.getSelectionModel().getSelectedItem().getContent();
+		if(current instanceof LoggableViewState) {
+			((LoggableViewState) current).reloadData();
+		}
 	}
 
 	private void feedbackPressed() {
@@ -83,5 +106,6 @@ public class MainWindow extends VBox {
 
 	interface LoggableViewState {
 		void appendViewState(StringBuilder sb);
+		void reloadData();
 	}
 }

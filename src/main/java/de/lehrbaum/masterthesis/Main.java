@@ -45,9 +45,8 @@ public class Main extends Application {
 	}
 
 	private static void setUpFileLogger() {
-		URL url = Main.class.getProtectionDomain().getCodeSource().getLocation();
 		try {
-			File folder = new File(url.toURI()).getParentFile();
+			File folder = getDirectoryForFiles();
 
 			File logFile = new File(folder, "protokol.log");
 			String logfilePath = logFile.getAbsolutePath().replace(File.separatorChar, '/');
@@ -59,8 +58,18 @@ public class Main extends Application {
 			loggerFile = logFile;
 		} catch(IOException e) {
 			logger.log(Level.SEVERE, "Problem setting up logger.", e);
+		}
+	}
+
+	public static File getDirectoryForFiles() {
+		URL url = Main.class.getProtectionDomain().getCodeSource().getLocation();
+		try {
+			File f = new File(url.toURI()).getParentFile();
+			if(f.canRead())
+				return f;
 		} catch(URISyntaxException e) {
 			logger.severe("Problem with the program folder: " + url);
 		}
+		return new File(System.getProperty("user.dir"));
 	}
 }

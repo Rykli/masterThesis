@@ -1,34 +1,47 @@
 package de.lehrbaum.masterthesis.inferencenodays;
 
-public interface InferenceNoDays {
-	enum SYMPTOM_STATE {
-		UNKOWN,
-		PRESENT,
-		ABSENT
-	}
+import de.lehrbaum.masterthesis.data.Answer;
+import de.lehrbaum.masterthesis.data.DataProvider;
 
+import java.util.EnumMap;
+import java.util.EnumSet;
+
+public interface InferenceNoDays {
 	double[] getDiseaseProbabilities();
 
-	boolean wasSymptomAnswered(int symptom);
+	boolean wasQuestionAnswered(int question);
 
 	/**
-	 * @param symptom The index of the symptom asked for.
-	 * @return At position 0 the probability of the symptom being answered as present, at position 1 the probability of
-	 * the symptom being answered as absent. If the symptom was already answered, the return value is unspecified.
+	 * @param question The index of the question.
+	 * @return The probabilities of the answers for this question.
 	 */
-	double[] probabilityOfSymptom(int symptom);
+	EnumMap<Answer, Double> probabilityOfAnswers(int question);
+
+	int getAmountQuestions();
+
+	EnumSet<Answer> possibleAnswersForQuestion(int question);
+
+	//TODO should move to different class, not part of inference.
+	TextGenerator getTextGenerator();
+
+	String getDiseaseName(int disease);
+
+	/**
+	 * Use this to recalculate after excel has changed
+	 */
+	void recalculateProbabilities();
 
 	/**
 	 * A complete inference is optimized to only once get information about symptoms. If you need to give information
 	 * step by step try an Implementation of the {@link StepByStepInferenceNoDays}
 	 */
 	interface CompleteInferenceNoDays extends InferenceNoDays {
-		void symptomsAnswered(SYMPTOM_STATE[] symptomsAnswered);
+		void symptomsAnswered(Answer[] symptomsAnswered);
 	}
 
 	interface StepByStepInferenceNoDays extends InferenceNoDays {
-		void symptomAnswered(int symptom, SYMPTOM_STATE state);
+		void questionAnswered(int symptom, Answer state);
 
-		double[] simulateSymptomAnswered(int symptom, boolean has);
+		double[] simulateQuestionAnswered(int symptom, Answer answer);
 	}
 }

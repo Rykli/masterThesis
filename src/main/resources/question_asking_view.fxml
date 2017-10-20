@@ -9,8 +9,8 @@
            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="de.lehrbaum.masterthesis.view.QuestionAskingView">
     <VBox alignment="CENTER" spacing="5">
         <Label fx:id="questionLabel" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
-        <Button defaultButton="true" maxWidth="Infinity" onAction="#yesPressed" text="Ja"/>
-        <Button maxWidth="Infinity" onAction="#noPressed" text="Nein"/>
+        <Button maxWidth="Infinity" onAction="#yesPressed" text="Ja" styleClass="present-button"/>
+        <Button maxWidth="Infinity" onAction="#noPressed" text="Nein" styleClass="present-button"/>
         <Button maxWidth="Infinity" onAction="#unknownPressed" text="Unbekannt"/>
         <Button cancelButton="true" maxWidth="Infinity" onAction="#backPressed" text="Zurück zum start"/>
     </VBox>

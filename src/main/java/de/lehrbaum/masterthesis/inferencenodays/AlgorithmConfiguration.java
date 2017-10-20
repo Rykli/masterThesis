@@ -8,14 +8,6 @@ import org.jetbrains.annotations.Nullable;
  * to use.
  */
 public class AlgorithmConfiguration {
-	public enum BAYES_SYMPTOMS_CALCULATION_VARIANT {
-		BAYES_SYMPTOMS_CALCULATION_VARIANT_1,
-		/**
-		 * This variant is stupid it calculates lower numbers the more symptoms there are.
-		 */
-		BAYES_SYMPTOMS_CALCULATION_VARIANT_2;
-		static final BAYES_SYMPTOMS_CALCULATION_VARIANT defaultValue = BAYES_SYMPTOMS_CALCULATION_VARIANT_1;
-	}
 
 	public enum QUESTION_ALGORITHM {
 		MINIMIZE_EXPECTED_ENTROPY,
@@ -24,38 +16,22 @@ public class AlgorithmConfiguration {
 	}
 
 	public enum BAYES_INFERENCE_VARIANT {
-		BAYES_INFERENCE_VARIANT_1,
-		BAYES_INFERENCE_VARIANT_2;
-		static final BAYES_INFERENCE_VARIANT defaultValue = BAYES_INFERENCE_VARIANT_1;
+		INFERENCE_BAYES_FORMULA,
+		INFERENCE_BAYES_UPDATING;
+		static final BAYES_INFERENCE_VARIANT defaultValue = INFERENCE_BAYES_FORMULA;
 	}
-	@Nullable private BAYES_SYMPTOMS_CALCULATION_VARIANT bayesSymptomsCalculationVariant;
 	@Nullable private QUESTION_ALGORITHM questionAlgorithm;
 	@Nullable private BAYES_INFERENCE_VARIANT bayesInferenceVariant;
 	private boolean normalize = true;
 	private double gainLimit = 0.01;
 
-	public AlgorithmConfiguration(@Nullable BAYES_SYMPTOMS_CALCULATION_VARIANT bayesSymptomsCalculationVariant,
-								  @Nullable QUESTION_ALGORITHM questionAlgorithm,
+	public AlgorithmConfiguration(@Nullable QUESTION_ALGORITHM questionAlgorithm,
 								  @Nullable BAYES_INFERENCE_VARIANT bayesInferenceVariant, boolean normalize,
 								  double gainLimit) {
-		setBayesSymptomsCalculationVariant(bayesSymptomsCalculationVariant);
 		setQuestionAlgorithm(questionAlgorithm);
 		setBayesInferenceVariant(bayesInferenceVariant);
 		setNormalize(normalize);
 		setGainLimit(gainLimit);
-	}
-
-	public @NotNull BAYES_SYMPTOMS_CALCULATION_VARIANT getBayesSymptomsCalculationVariant() {
-		if(bayesSymptomsCalculationVariant == null)
-			return BAYES_SYMPTOMS_CALCULATION_VARIANT.defaultValue;
-		return bayesSymptomsCalculationVariant;
-	}
-
-	public void setBayesSymptomsCalculationVariant(@Nullable BAYES_SYMPTOMS_CALCULATION_VARIANT
-														   bayesSymptomsCalculationVariant) {
-		if(bayesSymptomsCalculationVariant == null)
-			this.bayesSymptomsCalculationVariant = BAYES_SYMPTOMS_CALCULATION_VARIANT.defaultValue;
-		this.bayesSymptomsCalculationVariant = bayesSymptomsCalculationVariant;
 	}
 
 	public void setNormalize(boolean normalize) {
@@ -68,8 +44,7 @@ public class AlgorithmConfiguration {
 
 	@Override
 	public String toString() {
-		return "Algorithm configuration. Bayes symptom variant: " + getBayesSymptomsCalculationVariant()
-				+ ", bayes inference variant: " + getBayesInferenceVariant()
+		return "Algorithm configuration. Bayes inference variant: " + getInferenceVariant()
 				+ ", question algorithm: " + getQuestionAlgorithm()
 				+ ", normalize: " + getNormalize();
 	}
@@ -88,7 +63,7 @@ public class AlgorithmConfiguration {
 		this.questionAlgorithm = questionAlgorithm;
 	}
 
-	public BAYES_INFERENCE_VARIANT getBayesInferenceVariant() {
+	public BAYES_INFERENCE_VARIANT getInferenceVariant() {
 		if(bayesInferenceVariant == null)
 			return BAYES_INFERENCE_VARIANT.defaultValue;
 		return bayesInferenceVariant;

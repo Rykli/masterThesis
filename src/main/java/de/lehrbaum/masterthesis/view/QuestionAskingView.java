@@ -1,6 +1,7 @@
 package de.lehrbaum.masterthesis.view;
 
-import de.lehrbaum.masterthesis.data.NoDaysDefaultData;
+import de.lehrbaum.masterthesis.data.Answer;
+import de.lehrbaum.masterthesis.data.DataProvider;
 import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,8 +18,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.diseases;
-
 public class QuestionAskingView implements Initializable {
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(QuestionAskingView.class.getCanonicalName());
@@ -26,12 +25,12 @@ public class QuestionAskingView implements Initializable {
 	@FXML private BarChart<String, Number> diseaseChart;
 	@FXML private Label questionLabel;
 
-	private int symptomIndex;
+	private int questionIndex;
 	private InferenceNoDays inferenceNoDays;
 	private QuestionAnsweredListener listener;
 
-	private QuestionAskingView(int symptomIndex, InferenceNoDays inferenceNoDays, QuestionAnsweredListener listener) {
-		this.symptomIndex = symptomIndex;
+	private QuestionAskingView(int questionIndex, InferenceNoDays inferenceNoDays, QuestionAnsweredListener listener) {
+		this.questionIndex = questionIndex;
 		this.listener = listener;
 		this.inferenceNoDays = inferenceNoDays;
 	}
@@ -39,12 +38,12 @@ public class QuestionAskingView implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		//localize
-		questionLabel.setText(String.format("Haben sie %s?", NoDaysDefaultData.symptoms[symptomIndex]));
+		questionLabel.setText(inferenceNoDays.getTextGenerator().getQuestionText(questionIndex));
 
 		double[] diseaseProbs = inferenceNoDays.getDiseaseProbabilities();
 		for(int disease = 0; disease < diseaseProbs.length; disease++) {
 			XYChart.Series<String, Number> series = new XYChart.Series<>();
-			series.setName(diseases[disease]);
+			series.setName(inferenceNoDays.getDiseaseName(disease));
 			series.getData().add(new XYChart.Data<>("", diseaseProbs[disease]));
 			diseaseChart.getData().add(series);
 		}
@@ -52,17 +51,17 @@ public class QuestionAskingView implements Initializable {
 
 	@FXML
 	private void yesPressed(ActionEvent actionEvent) {
-		listener.questionAnswered(symptomIndex, InferenceNoDays.SYMPTOM_STATE.PRESENT);
+		listener.questionAnswered(questionIndex, Answer.PRESENT);
 	}
 
 	@FXML
 	private void noPressed(ActionEvent actionEvent) {
-		listener.questionAnswered(symptomIndex, InferenceNoDays.SYMPTOM_STATE.ABSENT);
+		listener.questionAnswered(questionIndex, Answer.ABSENT);
 	}
 
 	@FXML
 	private void unknownPressed(ActionEvent actionEvent) {
-		listener.questionAnswered(symptomIndex, InferenceNoDays.SYMPTOM_STATE.UNKOWN);
+		listener.questionAnswered(questionIndex, Answer.NOT_ANSWERED);
 	}
 
 	@FXML
@@ -71,7 +70,7 @@ public class QuestionAskingView implements Initializable {
 	}
 
 	public interface QuestionAnsweredListener {
-		void questionAnswered(int symptomIndex, InferenceNoDays.SYMPTOM_STATE answer);
+		void questionAnswered(int symptomIndex, Answer answer);
 
 		void navigateBackwards();
 	}

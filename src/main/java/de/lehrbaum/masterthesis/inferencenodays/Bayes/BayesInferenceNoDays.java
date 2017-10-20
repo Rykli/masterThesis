@@ -1,15 +1,20 @@
 package de.lehrbaum.masterthesis.inferencenodays.Bayes;
 
 import de.lehrbaum.masterthesis.MathUtils;
+import de.lehrbaum.masterthesis.data.Answer;
+import de.lehrbaum.masterthesis.data.DataProvider;
 import de.lehrbaum.masterthesis.inferencenodays.AbstractInferenceNoDays;
 import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
 import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.logging.Logger;
 
 import static de.lehrbaum.masterthesis.MathUtils.*;
 import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepByStepInferenceNoDays;
+import static de.lehrbaum.masterthesis.data.Answer.*;
 
 /**
  * This class contains an implementation of the bayes formula. It does not actually go step by step, but instead just
@@ -21,25 +26,28 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 	private static final Logger logger = Logger.getLogger(BayesInferenceNoDays.class.getCanonicalName());
 
 	/**
-	 * The probability for each symptom.
+	 * The probability for each answer of all symptoms.
 	 */
-	private double[][] symptomProbabilities;
+	private EnumMap<Answer, Double>[] currentSymptomProbs;
 
 	private AlgorithmConfiguration configuration;
 
-	public BayesInferenceNoDays(double[] aPrioriProbabilities, double[][] probabilities,
+	public BayesInferenceNoDays(@NotNull DataProvider dataProvider,
 								@NotNull AlgorithmConfiguration configuration) {
-		super(aPrioriProbabilities, probabilities, configuration);
+		super(dataProvider, configuration);
 		this.configuration = configuration;
-		updateSymptomProbabilities(symptomsStates);
+		updateSymptomProbabilities();
 	}
 
 	@Override
-	public void symptomAnswered(int symptom, SYMPTOM_STATE state) {
-		assert ! wasSymptomAnswered(symptom);
-		symptomsStates[symptom] = state;
-		if(state != SYMPTOM_STATE.UNKOWN)
-			symptomsAnswered(symptomsStates);
+	public void questionAnswered(int question, Answer answer) {
+		assert !wasQuestionAnswered(question);
+		if(question < symptomAnswers.length)
+			symptomAnswers[question] = answer;
+		else
+			aPrioriQuestionAnswers[question - symptomAnswers.length] = answer;
+		if(answer != NOT_ANSWERED)
+			symptomsAnswered(symptomAnswers);
 	}
 
 	private static double calculateProbabilityOfSymptom(double[] aPrioriProbabilities, double[][] probabilities, int
@@ -60,128 +68,117 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		return sum;
 	}
 
-	private double calculatePrOfSymptoms(double[] aPrioriProbabilities, double[][] probabilities,
-										 SYMPTOM_STATE[] symptomInformation) {
-		final long limit = 1 << aPrioriProbabilities.length;
-		/*
-		 * The probability of multiple symptoms is the sum over all possible hypothesis
-		 * of the probabilities for those symptoms given a hypothesis.
-		 * Formally: sum (from 0 to all hypothesis) pr[symptoms|hypothesis]*pr[hypothesis]
-		 */
-		double sum = 0;
-		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
-			double hypothesisProbability = calculatePrOfHypothesis(aPrioriProbabilities, hypothesis);
-			double probabilityOfSymptomsGivenHypothesis =
-					calculatePrOfSymptomsGivenHypothesis(probabilities, symptomInformation, hypothesis);
-			sum += hypothesisProbability * probabilityOfSymptomsGivenHypothesis;
+	@Override
+	public EnumMap<Answer, Double> probabilityOfAnswers(int question) {
+		if(isSymptom(question))
+			return currentSymptomProbs[question];
+		else {
+			EnumMap<Answer, Double> result = new EnumMap<>(Answer.class);
+			EnumSet<Answer> possibleAnswers = dataProvider.getAPrioriAnswerPossibilities(
+					question - symptomAnswers.length);
+			for(Answer a : possibleAnswers)
+				result.put(a, 1d/possibleAnswers.size());
+			return result;
 		}
-		return sum;
 	}
 
 	@Override
-	public double[] probabilityOfSymptom(int symptom) {
-		return symptomProbabilities[symptom];
-	}
-
-	@Override
-	public void symptomsAnswered(SYMPTOM_STATE[] symptomInformation) {
+	public void symptomsAnswered(Answer[] symptomAnswers) {
 		if(configuration.getNormalize())
-			currentProbabilities = MathUtils.normalize(calculateGivenAllSymptomStates(symptomInformation));
+			currentProbabilities = MathUtils.normalize(calculateGivenAllSymptomStates(symptomAnswers));
 		else
-			currentProbabilities = calculateGivenAllSymptomStates(symptomInformation);
+			currentProbabilities = calculateGivenAllSymptomStates(symptomAnswers);
 
-		//mark the symptoms as answered that are not unknown
-		this.symptomsStates = symptomInformation;
+		//mark the symptoms as answered that were answered
+		this.symptomAnswers = symptomAnswers;
 
-		updateSymptomProbabilities(symptomInformation);
+		updateSymptomProbabilities();
 	}
 
-	private double[] calculateGivenAllSymptomStates(SYMPTOM_STATE[] symptomInformation) {
+	private double[] calculateGivenAllSymptomStates(Answer[] symptomInformation) {
 		/*
 		 * Want to calculate the probability that a disease d_i is present given a set of symptoms S.
 		 * P(d_i | S) = nominator / denominator where
-		 * nominator = sum (of all Combinations of diseases H where d_i is active) of P(F|H)*P(H)
-		 * denominator = sum (of all Combinations of diseases H) of P(F|H)*P(H)
+		 * nominator = sum (of all Combinations of diseases H where d_i is active) of P(S|H)*P(H)
+		 * denominator = sum (of all Combinations of diseases H) of P(S|H)*P(H)
 		 *
-		 * The terms P(F|H) and P(H) will be explained in the subfunctions.
+		 * The terms P(S|H) and P(H) will be explained in the subfunctions.
 		 *
 		 * Since the denominator already calculates all summands necessary for the nominators, they will be calculated
 		 * as part of the denominator calculation.
 		 */
-		double[] diseaseNominators = new double[aPrioriProbabilities.length];
+		double[] diseaseNominators = new double[getAmountDiseases()];
 		double denominator
 				= calculateNominatorDenominator(symptomInformation, diseaseNominators);
-		for(int disease = 0; disease < diseaseNominators.length; disease++)
+		for(int disease = 0; disease < diseaseNominators.length; disease++) {
 			diseaseNominators[disease] /= denominator;
+		}
 		return diseaseNominators;
 	}
 
 	@Override
-	public double[] simulateSymptomAnswered(int symptom, boolean has) {
-		assert symptomsStates[symptom] == null;
-		symptomsStates[symptom] = has ? SYMPTOM_STATE.PRESENT : SYMPTOM_STATE.ABSENT;
-		double[] newProbabilities = calculateGivenAllSymptomStates(symptomsStates);
-		symptomsStates[symptom] = null;
+	public double[] simulateQuestionAnswered(int question, Answer answer) {
+		if(wasQuestionAnswered(question))
+			throw new UnsupportedOperationException("Question was already answered.");
+		double[] newProbabilities;
+		if(isSymptom(question)) {
+			//simulate it being answered
+			symptomAnswers[question] = answer;
+			newProbabilities = calculateGivenAllSymptomStates(symptomAnswers);
+			//remove the answer again
+			symptomAnswers[question] = NOT_ANSWERED;
+		} else {
+			//simulate it being answered
+			aPrioriQuestionAnswers[question - symptomAnswers.length] = answer;
+			newProbabilities = calculateGivenAllSymptomStates(symptomAnswers);
+			//remove the answer again
+			aPrioriQuestionAnswers[question - symptomAnswers.length] = NOT_ANSWERED;
+		}
 		if(configuration.getNormalize())
 			return MathUtils.normalize(newProbabilities);
 		else
 			return newProbabilities;
 	}
 
-	@Override
-	public String toString() {
-		return configuration.toString() +
-				"\nBayes inference no days:\n" +
-				super.toString();
-	}
-
-	private void updateSymptomProbabilities(SYMPTOM_STATE[] symptomsAnswered) {
-		symptomProbabilities = new double[amountSymptoms()][2];
-		for(int symptom = 0; symptom < amountSymptoms(); symptom++) {
-			if(symptomsStates[symptom] == SYMPTOM_STATE.PRESENT
-					|| symptomsStates[symptom] == SYMPTOM_STATE.ABSENT)
+	@SuppressWarnings("unchecked")
+	private void updateSymptomProbabilities() {
+		currentSymptomProbs = new EnumMap[symptomAnswers.length];
+		for(int symptom = 0; symptom < currentSymptomProbs.length; symptom++) {
+			if(wasQuestionAnswered(symptom))
 				continue;
 
-			double prob = 0;
-			switch(configuration.getBayesSymptomsCalculationVariant()) {
-				case BAYES_SYMPTOMS_CALCULATION_VARIANT_1:
-					//important to use the current probabilities here
-					prob = calculateProbabilityOfSymptom(currentProbabilities, probabilities, symptom);
-					break;
-				case BAYES_SYMPTOMS_CALCULATION_VARIANT_2:
-					SYMPTOM_STATE[] symptomInformation = symptomsAnswered.clone();
-					symptomInformation[symptom] = SYMPTOM_STATE.PRESENT;
-					prob = calculatePrOfSymptoms(aPrioriProbabilities, probabilities, symptomInformation);
-					break;
-			}
-			symptomProbabilities[symptom][0] = prob;
-			symptomProbabilities[symptom][1] = 1 - prob;
+			currentSymptomProbs[symptom] = new EnumMap<>(Answer.class);
+			//important to use current probabilities here
+			double prob = calculateProbabilityOfSymptom(currentProbabilities, dataProvider.getSymptomProbabilities(), symptom);
+			currentSymptomProbs[symptom].put(Answer.PRESENT, prob);
+			currentSymptomProbs[symptom].put(Answer.ABSENT, 1 - prob);
 		}
 	}
 
-	private double calculateNominatorDenominator(CompleteInferenceNoDays.SYMPTOM_STATE[] symptomInformation,
+	private double calculateNominatorDenominator(Answer[] symptomInformation,
 												 double[] diseaseNominators) {
 		/*
-		 * Here we need to calculate P(F|H)*P(H) of all Combinations of diseases H) (H stands for Hypothesis)
+		 * S: Symptoms
+		 * Here we need to calculate P(S|H)*P(H) of all Combinations of diseases H) (H stands for Hypothesis)
 		 * To do that we will just increase a binary number and refer to the bits as whether a disease is present or
 		 * not.
 		 * I assume the number of diseases is smaller than 64 which is the amount of bits in a long. This is
 		 * reasonable,
 		 * since if it where larger, the runtime would be crazy.
 		 */
-		final long limit = 1 << amountDiseases();
+		final long limit = 1 << getAmountDiseases();
 		double denominator = 0;
 		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
-			double hypothesisProbability = calculatePrOfHypothesis(aPrioriProbabilities, hypothesis);
-			double probabilityOfSymptomsGivenHypothesis =
-					calculatePrOfSymptomsGivenHypothesis(probabilities, symptomInformation, hypothesis);
+			double hypothesisProbability = calculatePrOfHypothesis(getAPrioriProbabilities(), hypothesis);
+			double probabilityOfSymptomsGivenHypothesis = calculatePrOfSymptomsGivenHypothesis(
+					dataProvider.getSymptomProbabilities(), symptomInformation, hypothesis);
 			double combinedProbability = hypothesisProbability * probabilityOfSymptomsGivenHypothesis;
 
 			//add the combined probability to the denominator.
 			denominator += combinedProbability;
 
 			//also add the combined probability to the nominators of the active diseases.
-			for(int disease = 0; disease < aPrioriProbabilities.length; disease++) {
+			for(int disease = 0; disease < getAmountDiseases(); disease++) {
 				if((hypothesis >> disease & 1) == 1) {
 					//disease is active
 					diseaseNominators[disease] += combinedProbability;
@@ -189,5 +186,17 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 			}
 		}
 		return denominator;
+	}
+
+	@Override
+	public void recalculateProbabilities() {
+		symptomsAnswered(symptomAnswers);
+	}
+
+	@Override
+	public String toString() {
+		return configuration.toString() +
+				"\nBayes inference no days:\n" +
+				super.toString();
 	}
 }

@@ -5,7 +5,7 @@ import de.lehrbaum.masterthesis.MathUtils;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
-public abstract class NoDaysDefaultData {
+abstract class NoDaysDefaultData {
 	public static final String[] symptoms = new String[] {
 			"Ohrschmerz", "Hörminderung", "Ohrdruck", "Ohrausfluss", "Tragus/Ohrhebeschmerz", "Fieber",
 			"Schmerzen bei Kauen", "Odynophagie/Ohrenschmerz beim Schlucken", "Druckschmerz Kiefergelenk",
@@ -31,6 +31,6 @@ public abstract class NoDaysDefaultData {
 			new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}).map(array -> DoubleStream.of(array).map(d -> d / 100).toArray()).toArray(double[][]::new);
 
-	public static final double[] aPriorProbabilities = MathUtils.normalize(new double[] {1, 1, 1, 1, 1, 1, 1, 1, 1,
+	public static final double[] aPrioriProbabilitiesOld = MathUtils.normalize(new double[] {1, 1, 1, 1, 1, 1, 1, 1, 1,
 			0.1});
 }

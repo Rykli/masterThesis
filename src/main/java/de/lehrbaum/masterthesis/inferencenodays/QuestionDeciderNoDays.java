@@ -1,11 +1,12 @@
 package de.lehrbaum.masterthesis.inferencenodays;
 
 import de.lehrbaum.masterthesis.MathUtils;
+import de.lehrbaum.masterthesis.data.Answer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Logger;
 
 import static de.lehrbaum.masterthesis.MathUtils.bhattacharyyaDistance;
-import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.symptoms;
 import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepByStepInferenceNoDays;
 
 /**
@@ -37,19 +38,19 @@ public class QuestionDeciderNoDays {
 	}
 
 	/**
-	 * @return -1 means it is recommended to stop asking and just return the highest result
+	 * @return -1 means it is recommended to stop asking and conclude
 	 */
 	public int recommendedSymptomToAsk() {
 		int questionToAsk = - 1;
 		double bestGain = - Double.MAX_VALUE;
 
-		for(int symptom = 0; symptom < symptoms.length; symptom++) {
-			if(inferenceNoDays.wasSymptomAnswered(symptom))
+		for(int question = 0; question < inferenceNoDays.getAmountQuestions(); question++) {
+			if(inferenceNoDays.wasQuestionAnswered(question))
 				continue;
-			double gainBySymptom = gainEvaluator.estimateGainByAskingSymptom(inferenceNoDays, symptom);
+			double gainBySymptom = gainEvaluator.estimateGainByAskingSymptom(inferenceNoDays, question);
 			if(gainBySymptom > bestGain) {
 				bestGain = gainBySymptom;
-				questionToAsk = symptom;
+				questionToAsk = question;
 			}
 		}
 		gainOfRecommendedQuestion = bestGain;
@@ -63,43 +64,36 @@ public class QuestionDeciderNoDays {
 		return questionToAsk;
 	}
 
-	private interface QuestionGainEvaluator {
-		double estimateGainByAskingSymptom(StepByStepInferenceNoDays inferenceNoDays, int symptom);
-	}
-
-	private static class MaximizeExpectedDistance implements QuestionGainEvaluator {
-
-		@Override
-		public double estimateGainByAskingSymptom(StepByStepInferenceNoDays inferenceNoDays, int
-				symptom) {
-			final double expectedGainIfPresent = getExpectedGain(inferenceNoDays, symptom, true);
-			final double expectedGainIfAbsent = getExpectedGain(inferenceNoDays, symptom, false);
-			return expectedGainIfAbsent + expectedGainIfPresent;
+	private static abstract class QuestionGainEvaluator {
+		double estimateGainByAskingSymptom(@NotNull StepByStepInferenceNoDays inferenceNoDays, int question) {
+			double estimatedGain = 0;
+			for(Answer a : inferenceNoDays.possibleAnswersForQuestion(question))
+				estimatedGain += getExpectedGain(inferenceNoDays, question, a);
+			return estimatedGain;
 		}
 
-		private static double getExpectedGain(StepByStepInferenceNoDays inferenceNoDays, int symptom,
-											  boolean present) {
+		protected abstract double getExpectedGain(@NotNull StepByStepInferenceNoDays inferenceNoDays, int question, Answer answer);
+	}
+
+	private static class MaximizeExpectedDistance extends QuestionGainEvaluator {
+
+		@Override
+		protected double getExpectedGain(@NotNull StepByStepInferenceNoDays inferenceNoDays, int question, Answer answer) {
 			final double distance = bhattacharyyaDistance(inferenceNoDays.getDiseaseProbabilities(),
-					inferenceNoDays.simulateSymptomAnswered(symptom, present));
+					inferenceNoDays.simulateQuestionAnswered(question, answer));
 			final double gain = Math.abs(distance);
-			return gain * inferenceNoDays.probabilityOfSymptom(symptom)[present ? 0 : 1];
+			return gain * inferenceNoDays.probabilityOfAnswers(question).get(answer);
 		}
 	}
 
-	private static class MinimizeExpectedEntropy implements QuestionGainEvaluator {
+	private static class MinimizeExpectedEntropy extends QuestionGainEvaluator {
 
 		@Override
-		public double estimateGainByAskingSymptom(StepByStepInferenceNoDays inferenceNoDays, int symptom) {
-			final double expectedGainIfPresent = getExpectedGain(inferenceNoDays, symptom, true);
-			final double expectedGainIfAbsent = getExpectedGain(inferenceNoDays, symptom, false);
-			return expectedGainIfAbsent + expectedGainIfPresent;
-		}
-
-		private double getExpectedGain(StepByStepInferenceNoDays inferenceNoDays, int symptom, boolean present) {
-			double entropy = MathUtils.entropy(inferenceNoDays.simulateSymptomAnswered(symptom, present));
+		protected double getExpectedGain(@NotNull StepByStepInferenceNoDays inferenceNoDays, int question, Answer answer) {
+			double entropy = MathUtils.entropy(inferenceNoDays.simulateQuestionAnswered(question, answer));
 			//lower entropy means higher gain since we want to minimize it. So its indirect proportional
 			double gain = 1 / entropy;
-			return inferenceNoDays.probabilityOfSymptom(symptom)[present ? 0 : 1] * gain;
+			return gain * inferenceNoDays.probabilityOfAnswers(question).get(answer);
 		}
 	}
 }

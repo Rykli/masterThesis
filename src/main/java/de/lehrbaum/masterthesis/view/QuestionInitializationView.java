@@ -1,30 +1,25 @@
 package de.lehrbaum.masterthesis.view;
 
+import de.lehrbaum.masterthesis.data.Answer;
 import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.StringConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.diseases;
+import static de.lehrbaum.masterthesis.data.Answer.*;
 
 /**
  * A controller for the starting view. It is an inner class, because it is strongly connected to the {@link
@@ -36,13 +31,19 @@ public class QuestionInitializationView implements Initializable {
 
 	/** This enum should be moved to another class as soon as it get's used. */
 	public enum Gender {
-		MALE("Männlich"),
-		FEMALE("Weiblich"),//localize
-		OTHER("Unbekannt");
+		MALE("Männlich", Answer.NO),
+		FEMALE("Weiblich", Answer.YES),//localize
+		OTHER("Unbekannt", Answer.NOT_ANSWERED);
 		private String description;
+		private Answer answer;
 
-		Gender(String description) {
+		Gender(String description, Answer answer) {
 			this.description = description;
+			this.answer = answer;
+		}
+
+		Answer getAnswer() {
+			return answer;
 		}
 
 		@Override
@@ -56,23 +57,18 @@ public class QuestionInitializationView implements Initializable {
 	@FXML private ChoiceBox<Gender> genderBox;
 	@FXML private TextArea initialProblemText;
 	@FXML private ChoiceBox<AlgorithmConfiguration.QUESTION_ALGORITHM> questionAlgorithmChoice;
-	@FXML private TableView<Integer> aPrioriTable;
-	@FXML private TableColumn<Integer, String> nameColumn;
-	@FXML private TableColumn<Integer, Double> aPrioriColumn;
 
-	private final ObservableList<Double> aPrioriDiseaseProb;
-	private String[] ageStages = new String[] {"0-10", "10-20", "20-30", "30-40", "40-50",
-			"50-60", "60-70", "70-80", "80-90", "90+"};
-	private AlgorithmConfiguration configuration;
+	private static final Answer[] ageStagesAnswers = new Answer[] {AGE_0_6, AGE_7_12, AGE_13_40, AGE_41_65, AGE_65_Inf};
+	private static final String[] ageStages = new String[] {"0-6", "7-12", "13-40", "41-65", "65+"};
+	private static final int AgeQuestionIndex = 21;
+	private static final int GenderQuestionIndex = AgeQuestionIndex + 3;
 	private QuestionInitializedListener listener;
 
-	private QuestionInitializationView(ObservableList<Double> aPrioriDiseaseProb,
-									   @NotNull QuestionInitializedListener listener) {
-		this.aPrioriDiseaseProb = aPrioriDiseaseProb;
+	private QuestionInitializationView(@NotNull QuestionInitializedListener listener) {
 		this.listener = listener;
-		configuration = new AlgorithmConfiguration();
 	}
 
+	//region set up UI
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		AlgorithmConfiguration defaultConfig = new AlgorithmConfiguration();
@@ -83,6 +79,7 @@ public class QuestionInitializationView implements Initializable {
 	private void initLeftSide(AlgorithmConfiguration config) {
 		genderBox.setItems(FXCollections.observableArrayList(Gender.values()));
 		genderBox.getSelectionModel().select(Gender.OTHER);
+		ageSlider.setMax(4);
 		ageSlider.setLabelFormatter(new StringConverter<Double>() {
 			@Override
 			public String toString(Double d) {
@@ -100,26 +97,11 @@ public class QuestionInitializationView implements Initializable {
 		questionAlgorithmChoice.setItems(
 				FXCollections.observableArrayList(AlgorithmConfiguration.QUESTION_ALGORITHM.values()));
 		questionAlgorithmChoice.getSelectionModel().select(config.getQuestionAlgorithm());
-
-		List<Integer> items = IntStream.range(0, aPrioriDiseaseProb.size()).boxed().collect(Collectors.toList());
-		aPrioriTable.setItems(FXCollections.observableList(items));
-		aPrioriTable.prefHeightProperty().bind(new ReadOnlyDoubleWrapper(24)
-				.multiply(Bindings.size(aPrioriTable.getItems()).add(1.5)));
-
-		nameColumn.setCellValueFactory(param -> new SimpleStringProperty(diseases[param.getValue()]));
-
-		aPrioriColumn.setCellValueFactory(param -> Bindings.valueAt(aPrioriDiseaseProb, param.getValue()));
-		aPrioriColumn.setCellFactory(TextFieldTableCell.forTableColumn(new ViewUtils.DoubleStringConverter()));
-		aPrioriColumn.setOnEditCommit(event -> {
-			if(event.getNewValue() != null) {
-				aPrioriDiseaseProb.set(event.getRowValue(), event.getNewValue());
-			}
-		});
-
 		questionAbortGain.setText(Double.toString(config.getGainLimit()));
 	}
 
-	//region set up UI
+	//endregion
+
 	@FXML
 	private void startPressed() {
 		AlgorithmConfiguration config = new AlgorithmConfiguration();
@@ -128,29 +110,33 @@ public class QuestionInitializationView implements Initializable {
 		try {
 			gainLimit = Double.parseDouble(questionAbortGain.getText());
 		} catch(NumberFormatException e) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Konnte Zahlenwert nicht konvertieren.");
-			alert.setHeaderText(null);
-			alert.setContentText(questionAbortGain.getText() + " ist nicht verwendbar");
-			alert.showAndWait();
+			alertParseError(questionAbortGain.getText() + " ist nicht verwendbar");
 			return;
 		}
 		config.setGainLimit(gainLimit);
-		listener.startPressed(config);
+		Map<Integer, Answer> initialValues = new HashMap<>();
+		initialValues.put(AgeQuestionIndex, ageStagesAnswers[(int) ageSlider.getValue()]);
+		initialValues.put(GenderQuestionIndex, genderBox.getValue().getAnswer());
+		listener.startPressed(config, initialValues);
 	}
 
-	//endregion
+	private void alertParseError(String content) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle("Konnte Zahlenwert nicht konvertieren.");
+		alert.setHeaderText(null);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
 
 	public interface QuestionInitializedListener {
-		void startPressed(@NotNull AlgorithmConfiguration configuration);
+		void startPressed(@NotNull AlgorithmConfiguration configuration, Map<Integer, Answer> initialAnswers);
 	}
 
-	static Node createQuestionInitializationView(ObservableList<Double> aPrioriDiseaseProb,
-												 @NotNull QuestionInitializedListener listener) {
+	static Node createQuestionInitializationView(@NotNull QuestionInitializedListener listener) {
 		try {
 			URL resource = QuestionInitializationView.class.getResource("/question_initialization_view.fxml");
 			FXMLLoader loader = new FXMLLoader(resource);
-			loader.setControllerFactory(param -> new QuestionInitializationView(aPrioriDiseaseProb, listener));
+			loader.setControllerFactory(param -> new QuestionInitializationView(listener));
 			loader.load();
 			return loader.getRoot();
 		} catch(IOException e) {

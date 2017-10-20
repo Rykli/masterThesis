@@ -20,8 +20,8 @@
             <RowConstraints vgrow="SOMETIMES"/>
         </rowConstraints>
         <Label text="Alter"/>
-        <Slider fx:id="ageSlider" majorTickUnit="1.0" max="9.0" minorTickCount="0" showTickLabels="true"
-                showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1"/>
+        <Slider fx:id="ageSlider" majorTickUnit="1.0" max="4.0" minorTickCount="0" showTickLabels="true"
+                showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1" value="2"/>
         <Label text="Geschlecht" GridPane.rowIndex="1"/>
         <ChoiceBox fx:id="genderBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         <Label text="Bitte beschreiben sie die Probleme die sie vermuten lassen, dass sie eine Krankheit haben."
@@ -44,14 +44,8 @@
         </rowConstraints>
         <Label text="Wählen sie den Algorithmus aus der die Fragen errechnen soll."/>
         <ChoiceBox fx:id="questionAlgorithmChoice" maxWidth="Infinity" GridPane.rowIndex="1"/>
-        <Label text="Wenn der erwartete Gewinn einer neuen Frage geringer ist als dieser Wert, wird die Befragung beendet." GridPane.rowIndex="2"/>
+        <Label text="Wenn der erwartete Gewinn einer neuen Frage geringer ist als dieser Wert, wird die Befragung beendet." GridPane.rowIndex="2" wrapText="true"/>
         <TextField fx:id="questionAbortGain" maxWidth="Infinity" GridPane.rowIndex="3" text="0"/>
-        <TableView fx:id="aPrioriTable" GridPane.rowIndex="4" editable="true">
-            <columns>
-                <TableColumn fx:id="nameColumn" text="Krankheit" editable="false" prefWidth="250"/>
-                <TableColumn fx:id="aPrioriColumn" text="A priori Wahrscheinlichkeit"/>
-            </columns>
-        </TableView>
 
     </GridPane>
 </SplitPane>

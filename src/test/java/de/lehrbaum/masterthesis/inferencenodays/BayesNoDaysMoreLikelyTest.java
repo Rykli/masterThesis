@@ -1,7 +1,8 @@
 package de.lehrbaum.masterthesis.inferencenodays;
 
 import de.lehrbaum.masterthesis.TestUtils;
-import de.lehrbaum.masterthesis.data.NoDaysDefaultData;
+import de.lehrbaum.masterthesis.data.Answer;
+import de.lehrbaum.masterthesis.exceptions.UserReadableException;
 import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -9,7 +10,7 @@ import org.junit.Test;
 
 import java.util.stream.Stream;
 
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.SYMPTOM_STATE.*;
+import static de.lehrbaum.masterthesis.data.Answer.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -30,16 +31,15 @@ public class BayesNoDaysMoreLikelyTest {
 	}
 
 	@Test
-	public void testCases() {
-		Stream.of(exampleCases).forEach(this::testIfCaseHoldsCompleteBayesInference);
+	public void testCases() throws UserReadableException {
+		for(ExampleCase exampleCase : exampleCases) {
+			testIfCaseHoldsCompleteBayesInference(exampleCase);
+		}
 	}
 
-	private void testIfCaseHoldsCompleteBayesInference(ExampleCase exCase) {
+	private void testIfCaseHoldsCompleteBayesInference(ExampleCase exCase) throws UserReadableException {
 
-		InferenceNoDays.CompleteInferenceNoDays inference = new BayesInferenceNoDays(NoDaysDefaultData
-				.aPriorProbabilities, NoDaysDefaultData.probabilities,
-
-				configuration);
+		InferenceNoDays.CompleteInferenceNoDays inference = AlgorithmFactory.getCompleteInferenceNoDays(configuration);
 		inference.symptomsAnswered(exCase.symptomStates);
 		double probLikelyDisease = inference.getDiseaseProbabilities()[exCase.likelyDisease];
 		double probUnlikelyDisease = inference.getDiseaseProbabilities()[exCase.unlikelyDisease];
@@ -51,10 +51,10 @@ public class BayesNoDaysMoreLikelyTest {
 
 	private ExampleCase[] exampleCases = new ExampleCase[] {
 		new ExampleCase(0, 5, /*90 vs 10*/PRESENT, /*30 vs 90*/ABSENT, /*20 vs 50*/ABSENT,
-				/*30 vs 10*/UNKOWN, /*90 vs 10*/PRESENT, /*0 vs 0*/ABSENT, /*10 vs 10*/ABSENT, /*10 vs 0*/ ABSENT,
-				/*20 vs 10*/UNKOWN, /*20 vs 0*/UNKOWN, /* 60 vs 20*/PRESENT, /*70 vs 10*/PRESENT, /*70 vs 0*/ PRESENT,
-				/*50 vs 60*/UNKOWN, /*20 vs 40*/ABSENT, /*0 vs 20*/ABSENT, /*0 vs 0*/ABSENT, /*30 vs 20*/UNKOWN,
-				/*10 vs 0*/UNKOWN, /*0 vs 0*/ABSENT, /*10 vs 10*/ABSENT	)
+				/*30 vs 10*/NOT_ANSWERED, /*90 vs 10*/PRESENT, /*0 vs 0*/ABSENT, /*10 vs 10*/ABSENT, /*10 vs 0*/ ABSENT,
+				/*20 vs 10*/NOT_ANSWERED, /*20 vs 0*/NOT_ANSWERED, /* 60 vs 20*/PRESENT, /*70 vs 10*/PRESENT,
+				/*70 vs 0*/ PRESENT, 	  /*50 vs 60*/NOT_ANSWERED, /*20 vs 40*/ABSENT, /*0 vs 20*/ABSENT, /*0 vs 0*/ABSENT,
+				/*30 vs 20*/NOT_ANSWERED, /*10 vs 0*/NOT_ANSWERED, /*0 vs 0*/ABSENT, /*10 vs 10*/ABSENT )
 	};
 
 	/**
@@ -62,12 +62,11 @@ public class BayesNoDaysMoreLikelyTest {
 	 * than another.
 	 */
 	private class ExampleCase {
-		InferenceNoDays.CompleteInferenceNoDays.SYMPTOM_STATE[] symptomStates;
+		Answer[] symptomStates;
 		int likelyDisease;
 		int unlikelyDisease;
 
-		ExampleCase(int likelyDisease, int unlikelyDisease, InferenceNoDays.CompleteInferenceNoDays.SYMPTOM_STATE...
-				symptomStates) {
+		ExampleCase(int likelyDisease, int unlikelyDisease, Answer... symptomStates) {
 			this.symptomStates = symptomStates;
 			this.likelyDisease = likelyDisease;
 			this.unlikelyDisease = unlikelyDisease;
