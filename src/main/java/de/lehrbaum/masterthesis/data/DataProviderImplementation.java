@@ -7,8 +7,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static de.lehrbaum.masterthesis.data.Answer.*;
-
-import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.*;
+import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.symptoms;
 
 public class DataProviderImplementation implements DataProvider {
 
@@ -26,6 +25,11 @@ public class DataProviderImplementation implements DataProvider {
 	/**[age][disease]*/
 	private double[][] aPrioriProbabilities;
 
+	/**[disease][day][symptom]*/
+	private double[][][] symptomProbabilities;
+
+	private String[] diseaseNames;
+
 	private DataProviderImplementation() throws ExcelLoadException {
 		resetInformation();
 	}
@@ -41,18 +45,18 @@ public class DataProviderImplementation implements DataProvider {
 	}
 
 	@Override
-	public double[][] getSymptomProbabilities() {
-		return probabilities;
+	public double[][][] getSymptomProbabilities() {
+		return symptomProbabilities;
 	}
 
 	@Override
 	public int getAmountDiseases() {
-		return diseases.length;
+		return diseaseNames.length;
 	}
 
 	@Override
 	public String[] getDiseaseNames() {
-		return diseases;
+		return diseaseNames;
 	}
 
 	@Override
@@ -116,7 +120,11 @@ public class DataProviderImplementation implements DataProvider {
 	@Override
 	public void resetInformation() throws ExcelLoadException {
 		ExcelReader excelReader = new ExcelReader();
+		diseaseNames = excelReader.getDiseaseNames();
 		readAPrioriFactors(excelReader);
+		symptomProbabilities = new double[diseaseNames.length][][];
+		for(int diseaseIndex = 0; diseaseIndex < diseaseNames.length; diseaseIndex++)
+			symptomProbabilities[diseaseIndex] = excelReader.getSymptomProbabilities(diseaseNames[diseaseIndex]);
 		aPrioriProbabilities = excelReader.getAPrioriBasedOnAge();
 		excelReader.close();
 	}

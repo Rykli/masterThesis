@@ -117,6 +117,11 @@ public class ExcelReader {
 		return result;
 	}
 
+	public double[][] getProbabilities(String disease) {
+		Sheet sheet = workbook.getSheet(disease);
+
+	}
+
 	public void close() {
 		try {
 			workbook.close();

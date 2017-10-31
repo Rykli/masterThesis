@@ -148,8 +148,8 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 				continue;
 
 			currentSymptomProbs[symptom] = new EnumMap<>(Answer.class);
-			//important to use current probabilities here
-			double prob = calculateProbabilityOfSymptom(currentProbabilities, dataProvider.getSymptomProbabilities(), symptom);
+			//important to use current probabilities here TODO
+			double prob = 0;//calculateProbabilityOfSymptom(currentProbabilities, dataProvider.getSymptomProbabilities(), symptom);
 			currentSymptomProbs[symptom].put(Answer.PRESENT, prob);
 			currentSymptomProbs[symptom].put(Answer.ABSENT, 1 - prob);
 		}
@@ -170,8 +170,8 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		double denominator = 0;
 		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
 			double hypothesisProbability = calculatePrOfHypothesis(getAPrioriProbabilities(), hypothesis);
-			double probabilityOfSymptomsGivenHypothesis = calculatePrOfSymptomsGivenHypothesis(
-					dataProvider.getSymptomProbabilities(), symptomInformation, hypothesis);
+			double probabilityOfSymptomsGivenHypothesis = 0;//calculatePrOfSymptomsGivenHypothesis( TODO
+					//dataProvider.getSymptomProbabilities(), symptomInformation, hypothesis);
 			double combinedProbability = hypothesisProbability * probabilityOfSymptomsGivenHypothesis;
 
 			//add the combined probability to the denominator.

@@ -14,11 +14,14 @@ public interface DataProvider {
 	}
 
 	/**
-	 * @return [disease][symptom]
+	 * @return [disease][day][symptom]
 	 */
-	double[][] getSymptomProbabilities();
+	double[][][] getSymptomProbabilities();
 
-	default double[] getSymptomProbabilitiesGivenDisease(int disease) {
+	/**
+	 * @return [day][symptom]
+	 */
+	default double[][] getSymptomProbabilitiesGivenDisease(int disease) {
 		return getSymptomProbabilities()[disease];
 	}
 
