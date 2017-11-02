@@ -1,12 +1,12 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
-import de.lehrbaum.masterthesis.data.DataProvider;
-import de.lehrbaum.masterthesis.data.DataProviderImplementation;
+import de.lehrbaum.masterthesis.data.DataProviderNoDays;
+import de.lehrbaum.masterthesis.data.DataProviderNoDaysImplementation;
 import de.lehrbaum.masterthesis.exceptions.UserReadableException;
-import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
+import de.lehrbaum.masterthesis.inference.nodays.BayesInferenceNoDays;
 import org.jetbrains.annotations.NotNull;
 
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.*;
+import static de.lehrbaum.masterthesis.inference.InferenceNoDays.*;
 
 public abstract class AlgorithmFactory {
 	public static @NotNull StepByStepInferenceNoDays getStepByStepInferenceNoDays(
@@ -31,7 +31,7 @@ public abstract class AlgorithmFactory {
 		return new QuestionDeciderNoDays(inference, configuration, configuration.getGainLimit());
 	}
 
-	public static DataProvider getDataProvider(@NotNull AlgorithmConfiguration config) throws UserReadableException {
-		return DataProviderImplementation.getInstance();
+	public static DataProviderNoDays getDataProvider(@NotNull AlgorithmConfiguration config) throws UserReadableException {
+		return DataProviderNoDaysImplementation.getInstance();
 	}
 }

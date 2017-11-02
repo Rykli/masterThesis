@@ -1,19 +1,16 @@
-package de.lehrbaum.masterthesis.inferencenodays.Bayes;
+package de.lehrbaum.masterthesis.inference.nodays;
 
-import de.lehrbaum.masterthesis.MathUtils;
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.data.DataProvider;
-import de.lehrbaum.masterthesis.inferencenodays.AbstractInferenceNoDays;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
-import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
+import de.lehrbaum.masterthesis.data.DataProviderNoDays;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.logging.Logger;
 
-import static de.lehrbaum.masterthesis.MathUtils.*;
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepByStepInferenceNoDays;
+import static de.lehrbaum.masterthesis.inference.InferenceNoDays.StepByStepInferenceNoDays;
 import static de.lehrbaum.masterthesis.data.Answer.*;
 
 /**
@@ -32,7 +29,7 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 
 	private AlgorithmConfiguration configuration;
 
-	public BayesInferenceNoDays(@NotNull DataProvider dataProvider,
+	public BayesInferenceNoDays(@NotNull DataProviderNoDays dataProvider,
 								@NotNull AlgorithmConfiguration configuration) {
 		super(dataProvider, configuration);
 		this.configuration = configuration;
@@ -48,24 +45,6 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 			aPrioriQuestionAnswers[question - symptomAnswers.length] = answer;
 		if(answer != NOT_ANSWERED)
 			symptomsAnswered(symptomAnswers);
-	}
-
-	private static double calculateProbabilityOfSymptom(double[] aPrioriProbabilities, double[][] probabilities, int
-			symptom) {
-		final long limit = 1 << aPrioriProbabilities.length;
-		/*
-		 * The probability of a symptom is the sum over all possible hypothesis
-		 * of the probabilities for that symptom given a hypothesis.
-		 * Formally: sum (from 0 to all hypothesis) pr[symptom|hypothesis]*pr[hypothesis]
-		 */
-		double sum = 0;
-		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
-			double hypothesisProbability = calculatePrOfHypothesis(aPrioriProbabilities, hypothesis);
-			double probabilityOfSymptomGivenHypothesis =
-					1 - calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
-			sum += hypothesisProbability * probabilityOfSymptomGivenHypothesis;
-		}
-		return sum;
 	}
 
 	@Override
@@ -84,15 +63,18 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 
 	@Override
 	public void symptomsAnswered(Answer[] symptomAnswers) {
-		if(configuration.getNormalize())
-			currentProbabilities = MathUtils.normalize(calculateGivenAllSymptomStates(symptomAnswers));
-		else
-			currentProbabilities = calculateGivenAllSymptomStates(symptomAnswers);
+		long start = System.nanoTime();
+		currentProbabilities = configuration.normalizeIfNeeded(
+				calculateGivenAllSymptomStates(symptomAnswers));
+		long duration = System.nanoTime() - start;
+		System.out.println("calculate given took in micros: " + duration/1000d);
 
 		//mark the symptoms as answered that were answered
 		this.symptomAnswers = symptomAnswers;
-
+		start = System.nanoTime();
 		updateSymptomProbabilities();
+		duration = System.nanoTime() - start;
+		System.out.println("Update symptoms took in micros: " + duration/1000d);
 	}
 
 	private double[] calculateGivenAllSymptomStates(Answer[] symptomInformation) {
@@ -134,10 +116,7 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 			//remove the answer again
 			aPrioriQuestionAnswers[question - symptomAnswers.length] = NOT_ANSWERED;
 		}
-		if(configuration.getNormalize())
-			return MathUtils.normalize(newProbabilities);
-		else
-			return newProbabilities;
+		return configuration.normalizeIfNeeded(newProbabilities);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -155,6 +134,26 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		}
 	}
 
+	private static double calculateProbabilityOfSymptom(double[] aPrioriProbabilities, double[][] probabilities, int
+			symptom) {
+		final long limit = 1 << aPrioriProbabilities.length;
+		/*
+		 * The probability of a symptom is the sum over all possible hypothesis
+		 * of the probabilities for that symptom given a hypothesis.
+		 * Formally: sum (from 0 to all hypothesis) pr[symptom|hypothesis]*pr[hypothesis]
+		 */
+		double sum = 0;
+		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
+			//takes about 0.9 microseconds
+			double hypothesisProbability = BayesNoDaysMath.calculatePrOfHypothesis(aPrioriProbabilities, hypothesis);
+			//takes about 0.13 microseconds
+			double probabilityOfSymptomGivenHypothesis =
+					1 - BayesNoDaysMath.calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
+			sum += hypothesisProbability * probabilityOfSymptomGivenHypothesis;
+		}
+		return sum;
+	}
+
 	private double calculateNominatorDenominator(Answer[] symptomInformation,
 												 double[] diseaseNominators) {
 		/*
@@ -169,8 +168,8 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 		final long limit = 1 << getAmountDiseases();
 		double denominator = 0;
 		for(long hypothesis = 0; hypothesis < limit; hypothesis++) {
-			double hypothesisProbability = calculatePrOfHypothesis(getAPrioriProbabilities(), hypothesis);
-			double probabilityOfSymptomsGivenHypothesis = calculatePrOfSymptomsGivenHypothesis(
+			double hypothesisProbability = BayesNoDaysMath.calculatePrOfHypothesis(getAPrioriProbabilities(), hypothesis);
+			double probabilityOfSymptomsGivenHypothesis = BayesNoDaysMath.calculatePrOfSymptomsGivenHypothesis(
 					dataProvider.getSymptomProbabilities(), symptomInformation, hypothesis);
 			double combinedProbability = hypothesisProbability * probabilityOfSymptomsGivenHypothesis;
 
@@ -196,7 +195,7 @@ public class BayesInferenceNoDays extends AbstractInferenceNoDays
 	@Override
 	public String toString() {
 		return configuration.toString() +
-				"\nBayes inference no days:\n" +
+				"\nnodays inference no days:\n" +
 				super.toString();
 	}
 }

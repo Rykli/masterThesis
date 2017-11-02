@@ -1,14 +1,11 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
 import de.lehrbaum.masterthesis.TestUtils;
 import de.lehrbaum.masterthesis.data.Answer;
 import de.lehrbaum.masterthesis.exceptions.UserReadableException;
-import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.stream.Stream;
 
 import static de.lehrbaum.masterthesis.data.Answer.*;
 import static org.junit.Assert.assertTrue;

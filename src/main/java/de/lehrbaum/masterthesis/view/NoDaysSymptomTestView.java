@@ -1,11 +1,11 @@
 package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.data.DataProvider;
+import de.lehrbaum.masterthesis.data.DataProviderNoDays;
 import de.lehrbaum.masterthesis.exceptions.UserReadableException;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmFactory;
-import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.AlgorithmFactory;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
 import javafx.geometry.HPos;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -27,7 +27,7 @@ class NoDaysSymptomTestView extends ScrollPane implements MainWindow.LoggableVie
 	private ToggleButton[][] symptomToggleButtons;
 	private double[] diseaseProbabilities;
 	private BarChart<String, Number> diseaseChart;
-	private DataProvider dataProvider;
+	private DataProviderNoDays dataProvider;
 
 	NoDaysSymptomTestView() {
 		super();
