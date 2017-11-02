@@ -4,7 +4,7 @@ import de.lehrbaum.masterthesis.exceptions.ExcelLoadException;
 
 import java.util.EnumSet;
 
-public interface DataProvider {
+public interface DataProviderNoDays {
 	int getAmountSymptoms();
 
 	String[] getSymptomNames();

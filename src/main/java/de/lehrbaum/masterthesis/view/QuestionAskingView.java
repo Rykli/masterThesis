@@ -1,8 +1,7 @@
 package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.data.DataProvider;
-import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

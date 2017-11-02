@@ -9,13 +9,13 @@ import java.util.Map;
 import static de.lehrbaum.masterthesis.data.Answer.*;
 import static de.lehrbaum.masterthesis.data.NoDaysDefaultData.symptoms;
 
-public class DataProviderImplementation implements DataProvider {
+public class DataProviderNoDaysImplementation implements DataProviderNoDays {
 
-	private static DataProviderImplementation instance;
+	private static DataProviderNoDaysImplementation instance;
 
-	public static DataProviderImplementation getInstance() throws ExcelLoadException {
+	public static DataProviderNoDaysImplementation getInstance() throws ExcelLoadException {
 	    if (instance == null)
-	        instance = new DataProviderImplementation();
+	        instance = new DataProviderNoDaysImplementation();
 	    return instance;
 	}
 
@@ -30,7 +30,7 @@ public class DataProviderImplementation implements DataProvider {
 
 	private String[] diseaseNames;
 
-	private DataProviderImplementation() throws ExcelLoadException {
+	private DataProviderNoDaysImplementation() throws ExcelLoadException {
 		resetInformation();
 	}
 

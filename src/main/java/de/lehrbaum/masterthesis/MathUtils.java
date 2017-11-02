@@ -10,55 +10,19 @@ import java.util.stream.DoubleStream;
  */
 public class MathUtils {
 
-	public static double[] normalize(double[] vector) {
-		double sum = DoubleStream.of(vector).sum();
-		return DoubleStream.of(vector).map(d -> d / sum).toArray();
-	}
-
-	public static double calculatePrOfSymptomsGivenHypothesis(
-			double[][] probabilities, Answer[] symptomInformation, long hypothesis) {
-		double result = 1;// the neutral element of multiplication is 1, so it should be the correct value.
-		for(int symptom = 0; symptom < symptomInformation.length; symptom++) {
-			if(symptomInformation[symptom] == null)
-				continue;
-			switch(symptomInformation[symptom]) {
-				case ABSENT:
-					result *= calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
-					break;
-				case PRESENT:
-					result *= 1 - calculatePrOfNotSymptomGivenHypothesis(probabilities, symptom, hypothesis);
-					break;
-				//ignore UNKOWN Symptoms
-			}
-		}
-		return result;
-	}
-
 	/**
-	 * Easier to calculate the negated probability than calculating positive probability. Use negative to get positive.
-	 *
-	 * @param probabilities [disease][symptom]
+	 * Alters the source array.
+	 * @return The array that was passed with sum of 1.
 	 */
-	public static double calculatePrOfNotSymptomGivenHypothesis(double[][] probabilities, int symptom, long
-			hypothesis) {
-		double result = 1;
-		for(int disease = 0; disease < probabilities.length; disease++) {
-			if((hypothesis >> disease & 1) == 1)
-				result *= 1 - probabilities[disease][symptom];
+	public static double[] normalize(@NotNull double[] vector) {
+		double sum = DoubleStream.of(vector).sum();
+		for(int i = 0; i < vector.length; i++) {
+			vector[i] = vector[i]/sum;
 		}
-		return result;
+		return vector;
 	}
 
-	public static double calculatePrOfHypothesis(double[] aPrioriProbabilities, long hypothesis) {
-		double result = 1;
-		for(int disease = 0; disease < aPrioriProbabilities.length; disease++) {
-			if((hypothesis >> disease & 1) == 1)
-				result *= aPrioriProbabilities[disease];
-			else
-				result *= 1 - aPrioriProbabilities[disease];
-		}
-		return result;
-	}
+	//TODO: move bayes math no days near the bayes class.
 
 	public static double bhattacharyyaDistance(double[] firstDistr, double[] secondDistr) {
 		// The distance is D(p, q) = -ln(sum of all possible diseases i of (root of p(i)*q(i)))

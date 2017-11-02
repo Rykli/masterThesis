@@ -2,19 +2,16 @@ package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.data.Answer;
 import de.lehrbaum.masterthesis.exceptions.UserReadableException;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmFactory;
-import de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays;
-import de.lehrbaum.masterthesis.inferencenodays.QuestionDeciderNoDays;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.AlgorithmFactory;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
+import de.lehrbaum.masterthesis.inference.QuestionDeciderNoDays;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.DoubleStream;
 
 import static de.lehrbaum.masterthesis.view.QuestionAskingView.QuestionAnsweredListener;
 import static de.lehrbaum.masterthesis.view.QuestionAskingView.createQuestionAskingView;

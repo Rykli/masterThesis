@@ -1,34 +1,35 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference.nodays;
 
 import de.lehrbaum.masterthesis.TestUtils;
 import de.lehrbaum.masterthesis.data.Answer;
 import de.lehrbaum.masterthesis.exceptions.UserReadableException;
-import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.AlgorithmFactory;
+import de.lehrbaum.masterthesis.inference.QuestionDeciderNoDays;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.*;
 
-import static de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration.QUESTION_ALGORITHM
+import static de.lehrbaum.masterthesis.inference.AlgorithmConfiguration.QUESTION_ALGORITHM
 		.MAXIMIZE_EXPECTED_PROBABILITY_DIFFERENCE;
-import static de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration.QUESTION_ALGORITHM
+import static de.lehrbaum.masterthesis.inference.AlgorithmConfiguration.QUESTION_ALGORITHM
 		.MINIMIZE_EXPECTED_ENTROPY;
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepByStepInferenceNoDays;
+import static de.lehrbaum.masterthesis.inference.InferenceNoDays.StepByStepInferenceNoDays;
 import static de.lehrbaum.masterthesis.data.Answer.*;
 
 /**
  * This class tests the deciding strategy.
  */
 public class TestDecider {
-	private static final Random random = new Random();
 	@BeforeClass
 	public static void setClassUp() throws Exception {
 		TestUtils.initializeTestLogging();
 	}
 	//TODO: run for different question deciders
 
-	@Test(timeout = 10000)
+	@Test(timeout = 20000)
 	public void testDoesDeciderTerminate() throws UserReadableException {
 		AlgorithmConfiguration config = new AlgorithmConfiguration();
 		for(int i = 0; i < 10; i++) {
@@ -38,17 +39,10 @@ public class TestDecider {
 			int questionToAsk = questionDecider.recommendedSymptomToAsk();
 
 			while(questionToAsk != - 1) {
-				answerRandomly(inference, questionToAsk);
+				TestUtils.answerRandomly(inference, questionToAsk);
 				questionToAsk = questionDecider.recommendedSymptomToAsk();
 			}
 		}
-	}
-
-	private void answerRandomly(StepByStepInferenceNoDays inferenceNoDays, int questionToAnswer) {
-		EnumSet<Answer> possibleAnswers = inferenceNoDays.possibleAnswersForQuestion(questionToAnswer);
-		int answerIndex = random.nextInt(possibleAnswers.size());
-		Answer answer = possibleAnswers.stream().skip(answerIndex).findFirst().orElse(null);
-		inferenceNoDays.questionAnswered(questionToAnswer, answer);
 	}
 
 	/**
@@ -69,7 +63,7 @@ public class TestDecider {
 			int amountQuestionsAsked = 0;
 			while(questionToAsk != - 1) {
 				amountQuestionsAsked++;
-				answerRandomly(inference, questionToAsk);
+				TestUtils.answerRandomly(inference, questionToAsk);
 				questionToAsk = questionDecider.recommendedSymptomToAsk();
 			}
 
@@ -111,7 +105,7 @@ public class TestDecider {
 				if(questionToAsk1 == - 1)
 					break;
 				questionOrder.add(questionToAsk1);
-				answerRandomly(inference, questionToAsk1);
+				TestUtils.answerRandomly(inference, questionToAsk1);
 			}
 		}
 	}

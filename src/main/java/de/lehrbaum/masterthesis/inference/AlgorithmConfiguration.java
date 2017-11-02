@@ -1,5 +1,6 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
+import de.lehrbaum.masterthesis.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,7 @@ public class AlgorithmConfiguration {
 
 	@Override
 	public String toString() {
-		return "Algorithm configuration. Bayes inference variant: " + getInferenceVariant()
+		return "Algorithm configuration. nodays inference variant: " + getInferenceVariant()
 				+ ", question algorithm: " + getQuestionAlgorithm()
 				+ ", normalize: " + getNormalize();
 	}
@@ -83,5 +84,14 @@ public class AlgorithmConfiguration {
 
 	public boolean getNormalize() {
 		return normalize;
+	}
+
+	/**
+	 * Normalizes the array if needed, otherwise just returns it.
+	 */
+	public double[] normalizeIfNeeded(@NotNull double[] array) {
+		if(normalize)
+			MathUtils.normalize(array);
+		return array;
 	}
 }

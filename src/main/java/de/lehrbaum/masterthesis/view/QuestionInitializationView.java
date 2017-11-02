@@ -1,7 +1,7 @@
 package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.inferencenodays.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

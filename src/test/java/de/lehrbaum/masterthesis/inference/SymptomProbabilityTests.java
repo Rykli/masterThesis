@@ -1,13 +1,8 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
 import de.lehrbaum.masterthesis.TestUtils;
-import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.inferencenodays.Bayes.BayesInferenceNoDays;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-
-import java.util.Arrays;
 
 @SuppressWarnings("unused")//remains in case the test should be needed again.
 public class SymptomProbabilityTests {

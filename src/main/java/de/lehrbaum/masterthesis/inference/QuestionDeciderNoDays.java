@@ -1,4 +1,4 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
 import de.lehrbaum.masterthesis.MathUtils;
 import de.lehrbaum.masterthesis.data.Answer;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.logging.Logger;
 
 import static de.lehrbaum.masterthesis.MathUtils.bhattacharyyaDistance;
-import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepByStepInferenceNoDays;
+import static de.lehrbaum.masterthesis.inference.InferenceNoDays.StepByStepInferenceNoDays;
 
 /**
  * This class should decide what question to ask next. It estimates a gain for each question that could be asked. The
@@ -17,8 +17,8 @@ import static de.lehrbaum.masterthesis.inferencenodays.InferenceNoDays.StepBySte
 public class QuestionDeciderNoDays {
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(QuestionDeciderNoDays.class.getCanonicalName());
-	/** Only used for test purposes. */
-	double gainOfRecommendedQuestion = Double.MAX_VALUE;
+	/** Only used for test purposes. Should be replaced with something fitting */
+	public double gainOfRecommendedQuestion = Double.MAX_VALUE;
 	private QuestionGainEvaluator gainEvaluator;
 	private StepByStepInferenceNoDays inferenceNoDays;
 	private double gainLimit;

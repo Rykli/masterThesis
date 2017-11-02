@@ -1,4 +1,4 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
 public interface TextGenerator {
 	String getQuestionText(int question);

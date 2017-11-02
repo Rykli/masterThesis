@@ -1,11 +1,15 @@
 package de.lehrbaum.masterthesis;
 
 import de.lehrbaum.masterthesis.data.Answer;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
 
+import java.util.EnumSet;
 import java.util.Random;
 import java.util.logging.*;
 
 public class TestUtils {
+	private static final Random random = new Random();
+
 	/**
 	 * All possible symptoms states are currently 3^20, that are to many to test them all.
 	 * So this method can generate random cases
@@ -45,5 +49,12 @@ public class TestUtils {
 		logger.addHandler(handler);
 		logger.setLevel(Level.ALL);
 		logger.setUseParentHandlers(false);
+	}
+
+	public static void answerRandomly(InferenceNoDays.StepByStepInferenceNoDays inferenceNoDays, int questionToAnswer) {
+		EnumSet<Answer> possibleAnswers = inferenceNoDays.possibleAnswersForQuestion(questionToAnswer);
+		int answerIndex = random.nextInt(possibleAnswers.size());
+		Answer answer = possibleAnswers.stream().skip(answerIndex).findFirst().orElse(null);
+		inferenceNoDays.questionAnswered(questionToAnswer, answer);
 	}
 }

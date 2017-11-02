@@ -1,11 +1,10 @@
 package de.lehrbaum.masterthesis.view;
 
 import de.lehrbaum.masterthesis.Main;
-import de.lehrbaum.masterthesis.data.DataProviderImplementation;
+import de.lehrbaum.masterthesis.data.DataProviderNoDaysImplementation;
 import de.lehrbaum.masterthesis.exceptions.ExcelLoadException;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -60,7 +59,7 @@ public class MainWindow extends VBox {
 
 	private void reloadPressed() {
 		try {
-			DataProviderImplementation.getInstance().resetInformation();
+			DataProviderNoDaysImplementation.getInstance().resetInformation();
 		} catch(ExcelLoadException e) {
 			ViewUtils.showErrorMessage(e, getScene());
 			return;

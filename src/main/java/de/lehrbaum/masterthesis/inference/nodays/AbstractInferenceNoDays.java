@@ -1,20 +1,23 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference.nodays;
 
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.data.DataProvider;
+import de.lehrbaum.masterthesis.data.DataProviderNoDays;
+import de.lehrbaum.masterthesis.inference.AlgorithmConfiguration;
+import de.lehrbaum.masterthesis.inference.InferenceNoDays;
+import de.lehrbaum.masterthesis.inference.TextGenerator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 
 /**
- * General inferencenodays for no days.
+ * General inference for no days.
  * Questions are index from symptom 0 to symptom n and then continue with aPrioriQuestion 0 to aPrioriQuestion m
  * So there are n + m questions.
  */
 public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 
-	protected final DataProvider dataProvider;
+	protected final DataProviderNoDays dataProvider;
 	/**
 	 * The current probability for each disease.
 	 */
@@ -27,7 +30,7 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 	@NotNull
 	protected AlgorithmConfiguration configuration;
 
-	public AbstractInferenceNoDays(@NotNull DataProvider dataProvider, @NotNull AlgorithmConfiguration configuration) {
+	public AbstractInferenceNoDays(@NotNull DataProviderNoDays dataProvider, @NotNull AlgorithmConfiguration configuration) {
 		this.dataProvider = dataProvider;
 		this.configuration = configuration;
 		symptomAnswers = new Answer[dataProvider.getAmountSymptoms()];
@@ -70,7 +73,7 @@ public abstract class AbstractInferenceNoDays implements InferenceNoDays {
 		return currentProbabilities.length;
 	}
 
-	protected DataProvider getDataProvider() {
+	protected DataProviderNoDays getDataProvider() {
 		return dataProvider;
 	}
 

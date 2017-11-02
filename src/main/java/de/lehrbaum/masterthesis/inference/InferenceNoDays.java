@@ -1,11 +1,10 @@
-package de.lehrbaum.masterthesis.inferencenodays;
+package de.lehrbaum.masterthesis.inference;
 
 import de.lehrbaum.masterthesis.data.Answer;
-import de.lehrbaum.masterthesis.data.DataProvider;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
-
+//TODO: this is actually not limited to no days, refractor packages.
 public interface InferenceNoDays {
 	double[] getDiseaseProbabilities();
 
@@ -40,7 +39,7 @@ public interface InferenceNoDays {
 	}
 
 	interface StepByStepInferenceNoDays extends InferenceNoDays {
-		void questionAnswered(int symptom, Answer state);
+		void questionAnswered(int question, Answer state);
 
 		double[] simulateQuestionAnswered(int symptom, Answer answer);
 	}
